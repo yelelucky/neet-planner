@@ -1,0 +1,33 @@
+/* Layout: installable app shell. Light = soft mint clay (off-white cards, mint pills, gentle layered shadows).
+   Dark = deep emerald with glossy mint and gold accents. Same structure as before; only colours, shapes and spacing changed. */
+:root{
+  --bg:#eef2ed;--surface:#fbfdfa;--surface2:#e8eee6;--fg:#1b2420;--muted:#5c6a63;--line:#dde5da;
+  --ink:#0d8a63;--ink-fg:#ffffff;--brand1:#c3f4df;--brand2:#8fe4c1;--brand3:#52cc9e;--on-brand:#0a3a2b;
+  --red:#cc3349;--red-bg:#fde8eb;--ok:#0e8a62;--ok-bg:#dcf4e8;--warn:#a26200;--warn-bg:#fff0d4;
+  --phy:#3a72e6;--chem:#df6d27;--zoo:#1b9654;--bot:#8d4fd4;
+  --gold1:#ffe08a;--gold2:#d9a12b;--ic1:#8fe8c4;--ic2:#25a678;--ic3:#3bc79b;--ic4:#0f7a59;
+  --bar:#cdf6e4;--page:radial-gradient(900px 520px at 100% -10%,#dff7ec 0%,transparent 70%);
+  --shadow:inset 0 1px 0 rgb(255 255 255 / .9),0 1px 2px rgb(24 60 44 / .06),0 10px 22px -12px rgb(24 60 44 / .22);
+  --shadow-lg:0 20px 40px -18px rgb(16 72 50 / .38);
+  --f-display:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:20px;--ease:cubic-bezier(.2,.8,.2,1);--spring:cubic-bezier(.34,1.56,.64,1);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#07140f;--surface:#0e1f19;--surface2:#152c24;--fg:#e4f4ec;--muted:#92b2a5;--line:#1e3a30;
+  --ink:#46d8a3;--ink-fg:#04140e;--brand1:#1fa57a;--brand2:#0e7556;--brand3:#074636;--on-brand:#f1fff8;
+  --red:#ff7387;--red-bg:#3a1720;--ok:#4fdca8;--ok-bg:#0f3327;--warn:#f2c05a;--warn-bg:#36290c;
+  --phy:#79a3ff;--chem:#ff9e5e;--zoo:#62d993;--bot:#c596ff;
+  --gold1:#ffe39a;--gold2:#c98f1c;--ic1:#7fe6bd;--ic2:#14966b;--ic3:#3fd0a1;--ic4:#0b6b4f;
+  --bar:#0b2a21;--page:radial-gradient(1100px 640px at 0% -12%,#134a3b 0%,transparent 65%);
+  --shadow:inset 0 1px 0 rgb(255 255 255 / .04),0 1px 2px rgb(0 0 0 / .35),0 12px 26px -14px rgb(0 0 0 / .75);--shadow-lg:0 20px 40px -16px rgb(0 0 0 / .8);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#07140f;--surface:#0e1f19;--surface2:#152c24;--fg:#e4f4ec;--muted:#92b2a5;--line:#1e3a30;
+  --ink:#46d8a3;--ink-fg:#04140e;--brand1:#1fa57a;--brand2:#0e7556;--brand3:#074636;--on-brand:#f1fff8;
+  --red:#ff7387;--red-bg:#3a1720;--ok:#4fdca8;--ok-bg:#0f3327;--warn:#f2c05a;--warn-bg:#36290c;
+  --phy:#79a3ff;--chem:#ff9e5e;--zoo:#62d993;--bot:#c596ff;
+  --gold1:#ffe39a;--gold2:#c98f1c;--ic1:#7fe6bd;--ic2:#14966b;--ic3:#3fd0a1;--ic4:#0b6b4f;
+  --bar:#0b2a21;--page:radial-gradient(1100px 640px at 0% -12%,#134a3b 0%,transparent 65%);
+  --shadow:inset 0 1px 0 rgb(255 255 255 / .04),0 1px 2px rgb(0 0 0 / .35),0 12px 26px -14px rgb(0 0 0 / .75);--shadow-lg:0 20px 40px -16px rgb(0 0 0 / .8);color-scheme:dark}
+:root:not([data-theme="dark"]){color-scheme:light}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){color-scheme:dark}}

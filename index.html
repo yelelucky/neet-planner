@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NEET 2027 Planner</title>
+<meta name="description" content="NEET 2027 study planner: daily lectures, weekly and monthly targets, tests, revisions and mistakes.">
+<meta name="theme-color" content="#c9f5e1">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="NEET 2027">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<!-- Shared icon colours (mint and gold clay). Icons below fill with these. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <linearGradient id="gm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--ic1)"/><stop offset="1" style="stop-color:var(--ic2)"/></linearGradient>
+  <linearGradient id="gg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--gold1)"/><stop offset="1" style="stop-color:var(--gold2)"/></linearGradient>
+  <linearGradient id="gt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--ic3)"/><stop offset="1" style="stop-color:var(--ic4)"/></linearGradient>
+</defs></svg>
+
+<div id="splash" aria-hidden="true"><img src="icons/icon.svg" alt="" width="96" height="96"><b>NEET 2027</b><span>Opening your plan…</span></div>
+
+<header class="top"><div class="top-in">
+  <div class="logo" aria-hidden="true"><img src="icons/icon.svg" alt="" width="40" height="40"></div>
+  <div class="brand"><b>NEET 2027</b><span id="topsub">Loading your plan…</span></div>
+  <button class="savebtn" id="savebtn" data-act="savenow" title="Save the change"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg><span id="savelbl">Save</span></button>
+  <button class="iconbtn" data-act="go" data-tab="syllabus" title="Syllabus" aria-label="Syllabus"><svg viewBox="0 0 24 24" class="clay"><path d="M5 4.5A2.5 2.5 0 0 1 7.5 2H19a1 1 0 0 1 1 1v15.5a1 1 0 0 1-1 1H7.5a1.5 1.5 0 0 0 0 3H19v-1" fill="none" stroke="url(#gt)" stroke-width="2" stroke-linecap="round"/><path d="M5 4.5A2.5 2.5 0 0 1 7.5 2H19a1 1 0 0 1 1 1v15.5a1 1 0 0 1-1 1H7.5A2.5 2.5 0 0 0 5 22Z" fill="url(#gm)"/><rect x="9" y="6" width="7.5" height="2.2" rx="1.1" fill="#fff" opacity=".9"/><rect x="9" y="10" width="5" height="2.2" rx="1.1" fill="url(#gg)"/></svg></button>
+  <button class="iconbtn" data-act="go" data-tab="mistakes" title="Mistake log" aria-label="Mistake log"><svg viewBox="0 0 24 24" class="clay"><path d="m15.5 15.5 5 5" stroke="url(#gg)" stroke-width="3.2" stroke-linecap="round"/><circle cx="10.5" cy="10.5" r="7.5" fill="url(#gm)"/><circle cx="10.5" cy="10.5" r="5" fill="#fff" opacity=".92"/><rect x="9.4" y="6.8" width="2.2" height="4.6" rx="1.1" fill="url(#gt)"/><circle cx="10.5" cy="13.6" r="1.2" fill="url(#gt)"/></svg></button>
+  <button class="iconbtn" data-act="go" data-tab="settings" title="Settings" aria-label="Settings"><svg viewBox="0 0 24 24" class="clay"><path d="M10.3 2h3.4l.6 2.6 1.9.8 2.3-1.4 2.4 2.4-1.4 2.3.8 1.9 2.6.6v3.4l-2.6.6-.8 1.9 1.4 2.3-2.4 2.4-2.3-1.4-1.9.8-.6 2.6h-3.4l-.6-2.6-1.9-.8-2.3 1.4-2.4-2.4 1.4-2.3-.8-1.9L2 13.7v-3.4l2.6-.6.8-1.9L4 5.5l2.4-2.4 2.3 1.4 1.9-.8Z" fill="url(#gm)"/><circle cx="12" cy="12" r="3.6" fill="url(#gg)"/><circle cx="12" cy="12" r="1.5" fill="#fff" opacity=".85"/></svg></button>
+</div></header>
+
+<main class="wrap" id="main"></main>
+
+<nav class="nav"><div class="nav-in" id="nav">
+  <button data-act="go" data-tab="today"><span class="e"><svg viewBox="0 0 24 24" class="clay"><rect x="4" y="3.5" width="16" height="18.5" rx="3.5" fill="url(#gm)"/><rect x="6.5" y="6.5" width="11" height="13" rx="2" fill="#fff" opacity=".95"/><path d="m8.6 12.6 2.2 2.2 4.6-4.6" fill="none" stroke="url(#gt)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><rect x="8" y="1.6" width="2.4" height="4.4" rx="1.2" fill="url(#gg)"/><rect x="13.6" y="1.6" width="2.4" height="4.4" rx="1.2" fill="url(#gg)"/></svg></span>Today</button>
+  <button data-act="go" data-tab="week"><span class="e"><svg viewBox="0 0 24 24" class="clay"><rect x="2.5" y="4" width="19" height="17.5" rx="4" fill="url(#gm)"/><rect x="2.5" y="4" width="19" height="5.5" rx="3" fill="url(#gt)"/><rect x="6" y="12.5" width="12" height="3" rx="1.5" fill="#fff" opacity=".95"/><rect x="6.5" y="2" width="2.4" height="4.5" rx="1.2" fill="url(#gg)"/><rect x="15.1" y="2" width="2.4" height="4.5" rx="1.2" fill="url(#gg)"/></svg></span>Week</button>
+  <button data-act="go" data-tab="month"><span class="e"><svg viewBox="0 0 24 24" class="clay"><rect x="2.5" y="4" width="19" height="17.5" rx="4" fill="url(#gm)"/><rect x="2.5" y="4" width="19" height="5.5" rx="3" fill="url(#gt)"/><g fill="#fff" opacity=".95"><rect x="6" y="11.5" width="3" height="3" rx="1"/><rect x="10.5" y="11.5" width="3" height="3" rx="1"/><rect x="6" y="16" width="3" height="3" rx="1"/><rect x="10.5" y="16" width="3" height="3" rx="1"/></g><rect x="15" y="11.5" width="3" height="3" rx="1" fill="url(#gg)"/><rect x="6.5" y="2" width="2.4" height="4.5" rx="1.2" fill="url(#gg)"/><rect x="15.1" y="2" width="2.4" height="4.5" rx="1.2" fill="url(#gg)"/></svg></span>Month</button>
+  <button data-act="go" data-tab="tests"><span class="e"><svg viewBox="0 0 24 24" class="clay"><circle cx="12" cy="12" r="10" fill="url(#gm)"/><circle cx="12" cy="12" r="6.6" fill="#fff" opacity=".95"/><circle cx="12" cy="12" r="4" fill="url(#gt)"/><circle cx="12" cy="12" r="1.8" fill="url(#gg)"/></svg></span>Tests</button>
+  <button data-act="go" data-tab="dash"><span class="e"><svg viewBox="0 0 24 24" class="clay"><rect x="3" y="11" width="4" height="9" rx="1.6" fill="url(#gm)"/><rect x="10" y="4" width="4" height="16" rx="1.6" fill="url(#gg)"/><rect x="17" y="8" width="4" height="12" rx="1.6" fill="url(#gt)"/><rect x="1.5" y="20" width="21" height="2.4" rx="1.2" fill="url(#gt)"/></svg></span>Stats</button>
+</div></nav>
+
+<div id="modal"></div>
+<div id="toast" class="toast" hidden></div>
+
+<script src="config.js"></script>
+<script src="shared-data.js"></script>
+<script src="storage.js"></script>
+<script src="app.js"></script>
+<script>
+/* Offline support: the service worker keeps a copy of the app on this device. When a new version is ready, a button offers to load it. */
+/* On this computer's test server (localhost) it only runs with ?sw=1, so edits show up straight away. */
+const swOff=/^(localhost|127\.0\.0\.1)$/.test(location.hostname)&&!/[?&]sw=1/.test(location.search);
+if(swOff&&'serviceWorker' in navigator)navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister()));
+if('serviceWorker' in navigator&&location.protocol!=='file:'&&!swOff){addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').then(reg=>{
+  const offer=w=>{const t=document.getElementById('toast');t.innerHTML='New version ready <button class="btn sm" id="upd">Update</button>';t.hidden=false;t.classList.add('show','upd');
+    document.getElementById('upd').onclick=async()=>{try{await store.writeLocal()}catch(e){}w.postMessage('skip')}};
+  if(reg.waiting&&navigator.serviceWorker.controller)offer(reg.waiting);
+  reg.addEventListener('updatefound',()=>{const w=reg.installing;w&&w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)offer(w)})});
+  setInterval(()=>reg.update().catch(()=>{}),3600e3)}).catch(console.error);
+  let reloading=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!reloading){reloading=true;location.reload()}})})}
+</script>
+</body>
+</html>

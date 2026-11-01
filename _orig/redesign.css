@@ -1,0 +1,86 @@
+
+/* ===================== Redesign layer (looks only) ===================== */
+html{background:var(--bg)}
+body{margin:0;background:var(--page),var(--bg);background-repeat:no-repeat;min-height:100dvh}
+/* app bar: mint in light, deep emerald in dark */
+.top{contain:inline-size;padding-top:env(safe-area-inset-top,0px);top:0;background:linear-gradient(120deg,var(--brand1),var(--brand2) 60%,var(--brand3));box-shadow:0 10px 26px -18px rgb(10 58 43 / .7)}
+.logo{background:none;border:0;padding:0;overflow:hidden;border-radius:12px;box-shadow:0 6px 14px -6px rgb(0 0 0 / .35)}
+.logo img{display:block;width:40px;height:40px}
+.iconbtn{border-radius:999px}
+.top .iconbtn{background:rgb(255 255 255 / .55);border-color:rgb(255 255 255 / .7)}
+.top .iconbtn:hover{background:rgb(255 255 255 / .8)}
+.top .iconbtn[aria-current="page"]{background:var(--surface);border-color:var(--surface);box-shadow:0 0 0 3px rgb(255 255 255 / .45)}
+:root[data-theme="dark"] .top .iconbtn{background:rgb(255 255 255 / .08);border-color:rgb(255 255 255 / .14)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .top .iconbtn{background:rgb(255 255 255 / .08);border-color:rgb(255 255 255 / .14)}}
+.iconbtn svg.clay{width:24px;height:24px;filter:drop-shadow(0 2px 2px rgb(0 0 0 / .18))}
+.savebtn{border-radius:999px}
+.savebtn.done{background:rgb(255 255 255 / .35);border-color:rgb(255 255 255 / .5)}
+/* tab bar: solid surface (no blur, smoother on phones) */
+.nav-in{background:var(--surface);border-radius:26px;box-shadow:var(--shadow-lg),inset 0 1px 0 rgb(255 255 255 / .6)}
+.nav button .e{width:50px;height:32px}
+.nav button .e svg.clay{width:24px;height:24px;filter:drop-shadow(0 2px 1.5px rgb(0 0 0 / .18));transition:transform .35s var(--spring)}
+.nav button:not([aria-current="page"]) .e svg.clay{filter:saturate(.55) drop-shadow(0 1px 1px rgb(0 0 0 / .12));opacity:.8}
+.nav button[aria-current="page"] .e{background:color-mix(in srgb,var(--brand2) 45%,transparent);box-shadow:0 0 0 4px color-mix(in srgb,var(--brand2) 18%,transparent)}
+.nav button[aria-current="page"] .e svg.clay{transform:translateY(-1px) scale(1.08)}
+/* cards: soft clay */
+.card,.subj,.sched div,.task,.sylsub,.tbl{box-shadow:var(--shadow)}
+.task{border-radius:16px;background:color-mix(in srgb,var(--surface2) 35%,var(--surface))}
+.subj-h>span:first-child{border-radius:12px;box-shadow:inset 0 1px 0 rgb(255 255 255 / .5)}
+.hero{border-radius:26px}
+.hero .ring.onb .tr{stroke:color-mix(in srgb,var(--on-brand) 16%,transparent)}
+.hchip{background:rgb(255 255 255 / .28);border-color:rgb(255 255 255 / .4)}
+.hbtn{border-radius:999px;background:rgb(255 255 255 / .3);border-color:rgb(255 255 255 / .45)}
+:root[data-theme="dark"] :is(.hchip,.hbtn){background:rgb(255 255 255 / .1);border-color:rgb(255 255 255 / .18)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) :is(.hchip,.hbtn){background:rgb(255 255 255 / .1);border-color:rgb(255 255 255 / .18)}}
+.hbtn.solid{background:var(--on-brand);color:var(--brand2);border-color:transparent}
+/* buttons: pills with a mint glow on hover, like the styleguide */
+.btn,.pbtn,.chip{border-radius:999px}
+.btn.pri{color:var(--on-brand);box-shadow:inset 0 1px 0 rgb(255 255 255 / .5),0 8px 18px -10px var(--brand3)}
+.btn.pri:hover{box-shadow:0 0 0 4px color-mix(in srgb,var(--brand2) 30%,transparent),0 8px 18px -10px var(--brand3)}
+.btn:disabled{background:var(--surface2);color:var(--muted);box-shadow:none}
+.seg{border-radius:999px;box-shadow:inset 0 1px 3px rgb(0 0 0 / .08)}
+.seg button{border-radius:999px}
+.seg button[aria-pressed="true"]{background:linear-gradient(120deg,var(--brand1),var(--brand2));color:var(--on-brand);box-shadow:inset 0 1px 0 rgb(255 255 255 / .5),0 4px 10px -6px var(--brand3)}
+.wkchips button{border-radius:18px}
+:focus-visible{outline:3px solid color-mix(in srgb,var(--brand3) 75%,transparent);outline-offset:2px}
+input[type=text],input[type=number],input[type=date],input[type=email],input[type=password],select,textarea{border-radius:16px;background:var(--surface);box-shadow:inset 0 1px 3px rgb(0 0 0 / .06)}
+input[type=email],input[type=password]{width:100%;border:1.5px solid var(--line);padding:10px 12px;min-height:46px;font-size:15px;color:var(--fg);font-weight:500}
+input:focus,select:focus,textarea:focus{border-color:var(--brand3);box-shadow:0 0 0 4px color-mix(in srgb,var(--brand2) 35%,transparent)}
+.tick{border-radius:16px}
+.tick .box{border-radius:10px}
+.tick.on .box{box-shadow:inset 0 1px 0 rgb(255 255 255 / .35),0 4px 10px -4px var(--c,var(--ink))}
+.bar{height:9px}
+.bar>i{background:linear-gradient(90deg,color-mix(in srgb,var(--c,var(--brand3)) 55%,var(--surface)),var(--c,var(--brand3)))}
+.ring .vl{stroke:var(--c,var(--brand3))}
+.sheet{border-radius:28px 28px 0 0}
+@media (min-width:700px){.sheet{border-radius:28px}}
+.scrim{background:rgb(4 22 16 / .45)}
+.toast{border-radius:999px}
+.toast.upd{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:8px 8px 8px 18px}
+.toast.upd .btn{min-height:34px;background:var(--brand2);color:var(--on-brand);border:0}
+/* splash shown while the app opens */
+#splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:radial-gradient(120% 80% at 30% 10%,#1e8f6e,#0b4a3a 60%,#062a22);color:#f1fff8;font-family:var(--f-display);transition:opacity .35s ease,visibility .35s}
+#splash img{border-radius:24px;box-shadow:0 18px 40px -12px rgb(0 0 0 / .6)}
+#splash b{font-size:22px;letter-spacing:-.02em}
+#splash span{font-size:13px;opacity:.8}
+html.ready #splash{opacity:0;visibility:hidden;pointer-events:none}
+/* tablet and desktop: wider layout, subjects side by side, side rail on large screens */
+@media (min-width:900px){
+  .wrap,.top-in{max-width:960px}
+  main .stack:has(>.subj){display:grid;grid-template-columns:1fr 1fr;align-items:start}
+}
+@media (min-width:1100px){
+  body{padding-left:248px}
+  .top{margin-left:-248px;padding-left:248px}
+  .nav{top:0;bottom:0;right:auto;width:248px;padding:calc(14px + env(safe-area-inset-top,0px)) 14px 18px max(14px,env(safe-area-inset-left,0px));display:flex;flex-direction:column}
+  .nav::before{content:"NEET 2027";display:block;font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:-.02em;padding:10px 12px 16px;color:var(--fg)}
+  .nav-in{grid-template-columns:1fr;max-width:none;margin:0;gap:4px;padding:10px;border-radius:24px}
+  .nav button{flex-direction:row;justify-content:flex-start;gap:10px;padding:6px 10px;font-size:14.5px}
+  .wrap,.top-in{max-width:1080px}
+  .wrap{padding-block:22px 48px}
+  .toast{bottom:28px;left:calc(50% + 124px)}
+}
+/* the suggestion glow fades a ring in and out (cheap for phones) instead of redrawing the button shadow */
+.pbtn.hint{animation:none;position:relative}
+.pbtn.hint::after{content:"";position:absolute;inset:-5px;border-radius:inherit;box-shadow:0 0 0 4px color-mix(in srgb,var(--g1) 30%,transparent);opacity:0;animation:glowo 2.2s ease-in-out infinite;pointer-events:none;will-change:opacity}
+@keyframes glowo{50%{opacity:1}}
