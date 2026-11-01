@@ -20,7 +20,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   await ev(`import('/tests/perf.js').then(()=>PERF.load())`);
   await send('Emulation.setCPUThrottlingRate',{rate});
   const t0=Date.now();await send('Page.reload');await sleep(300);
-  const boot=await ev(`new Promise(r=>{const c=()=>document.documentElement.classList.contains('ready')?r(performance.now()):setTimeout(c,10);c()})`);
+  const boot=await ev(`new Promise(r=>{const c=()=>document.documentElement.classList.contains('app-ready')?r(performance.now()):setTimeout(c,10);c()})`);
   const warm=await ev(`new Promise(r=>{const c=()=>warmUp.done?r(warmUp.done):setTimeout(c,50);c()})`); /* background prep, while Today is on screen */
   const res=await ev(`import('/tests/perf.js').then(async()=>{return PERF.run()})`);
   res['app opens (to first screen)']={ms:Math.round(boot)};res['background prep finished']={atMs:Math.round(warm)};

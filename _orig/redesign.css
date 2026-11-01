@@ -63,23 +63,73 @@ input:focus,select:focus,textarea:focus{border-color:var(--brand3);box-shadow:0 
 #splash img{border-radius:24px;box-shadow:0 18px 40px -12px rgb(0 0 0 / .6)}
 #splash b{font-size:22px;letter-spacing:-.02em}
 #splash span{font-size:13px;opacity:.8}
-html.ready #splash{opacity:0;visibility:hidden;pointer-events:none}
-/* tablet and desktop: wider layout, subjects side by side, side rail on large screens */
-@media (min-width:900px){
+html.app-ready #splash{opacity:0;visibility:hidden;pointer-events:none}
+/* Phone and tablet keep the bottom tab bar. The three extra rail items (Syllabus, Mistakes, Settings) are for desktop only. */
+.nav .desk{display:none}
+/* tablet: a little wider, subjects side by side */
+@media (min-width:900px) and (max-width:1099.98px){
   .wrap,.top-in{max-width:960px}
   main .stack:has(>.subj){display:grid;grid-template-columns:1fr 1fr;align-items:start}
 }
+/* ===== Desktop (1100px and wider): side menu, full-width content, cards in columns ===== */
 @media (min-width:1100px){
-  body{padding-left:248px}
-  .top{margin-left:-248px;padding-left:248px}
-  .nav{top:0;bottom:0;right:auto;width:248px;padding:calc(14px + env(safe-area-inset-top,0px)) 14px 18px max(14px,env(safe-area-inset-left,0px));display:flex;flex-direction:column}
-  .nav::before{content:"NEET 2027";display:block;font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:-.02em;padding:10px 12px 16px;color:var(--fg)}
-  .nav-in{grid-template-columns:1fr;max-width:none;margin:0;gap:4px;padding:10px;border-radius:24px}
-  .nav button{flex-direction:row;justify-content:flex-start;gap:10px;padding:6px 10px;font-size:14.5px}
-  .wrap,.top-in{max-width:1080px}
-  .wrap{padding-block:22px 48px}
-  .toast{bottom:28px;left:calc(50% + 124px)}
+  :root{--rail:252px}
+  body{padding-left:var(--rail);font-size:15.5px}
+  /* side menu with every screen; the top bar keeps the title, countdown and Save */
+  .nav{top:0;bottom:0;right:auto;width:var(--rail);padding:calc(18px + env(safe-area-inset-top,0px)) 16px 20px 16px;display:flex;flex-direction:column;border-right:1px solid var(--line);background:color-mix(in srgb,var(--surface) 70%,var(--bg))}
+  .nav::before{content:"";display:block;height:52px;margin:0 6px 14px;background:url(icons/icon.svg) left center/44px 44px no-repeat}
+  .nav::after{content:"NEET 2027";position:absolute;top:calc(30px + env(safe-area-inset-top,0px));left:78px;font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:-.02em;color:var(--fg)}
+  .nav-in{grid-template-columns:1fr;max-width:none;margin:0;gap:2px;padding:0;border:0;border-radius:0;background:none;box-shadow:none}
+  .nav .desk{display:flex}
+  .nav .desk.first{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);border-radius:0 0 16px 16px}
+  .nav button{flex-direction:row;justify-content:flex-start;gap:12px;padding:7px 10px;font-size:15px;font-weight:700;border-radius:16px;transition:background .2s,color .2s}
+  .nav button:hover{background:color-mix(in srgb,var(--brand2) 16%,transparent);color:var(--fg)}
+  .nav button[aria-current="page"]{background:color-mix(in srgb,var(--brand2) 30%,transparent);color:var(--fg)}
+  .nav button[aria-current="page"] .e{background:none;box-shadow:none}
+  .nav button .e{width:36px;height:32px}
+  .top{margin-left:calc(-1 * var(--rail));padding-left:var(--rail)}
+  .top .logo,.top .iconbtn{display:none}
+  .top-in{padding-block:12px}
+  .brand b{font-size:20px}
+  .brand span{font-size:13px}
+  .wrap,.top-in{max-width:1240px;padding-left:32px;padding-right:32px}
+  .wrap{padding-block:26px 56px}
+  .toast{bottom:28px;left:calc(50% + var(--rail) / 2)}
+  /* lists of cards flow into two columns; headings, notes and buttons in a list still take the full width */
+  #main .sec>.stack:not(.card){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:14px}
+  #main .sec>.stack:not(.card)>:not(.card):not(.subj){grid-column:1/-1}
+  #main .sec>.stack:not(.card)>.card.backlog,#main .sec>.stack:not(.card)>.card:only-child{grid-column:1/-1}
+  /* Today: date card and day plan side by side, schedule under them */
+  #main .hero{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px 24px;padding:24px 28px}
+  #main .hero .hero-top{grid-column:1}
+  #main .hero .daynav{grid-column:2;margin:0;min-width:300px}
+  #main .hero h1{font-size:26px}
+  .sched{gap:12px}
+  .sched div{padding:12px 14px 12px 18px;font-size:13px}
+  .sched b{font-size:14px}
+  /* Week and Month: week chips spread out, no sideways scrolling */
+  .wkchips{flex-wrap:wrap;overflow:visible}
+  .wkchips button{flex:1 1 150px;padding:10px 14px}
+  .monthbar h1{font-size:24px}
+  /* stats tiles: four across */
+  .grid2{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+  .grid2[style*="repeat(3"]{grid-template-columns:repeat(3,1fr)!important}
+  /* test syllabus panels side by side */
+  .syl{grid-template-columns:repeat(2,minmax(0,1fr))}
+  /* cards react to the mouse */
+  .card,.subj{transition:box-shadow .2s,transform .2s}
+  #main .sec>.stack:not(.card)>.card:hover{box-shadow:var(--shadow),0 14px 28px -18px rgb(16 72 50 / .45)}
+  .btn,.chip,.pbtn,.tick,.add,.x,.mini{cursor:pointer}
+  .tick:hover{border-color:color-mix(in srgb,var(--c,var(--brand3)) 55%,var(--line))}
+  .sheet{max-width:720px}
 }
+@media (min-width:1500px){
+  #main .sec>.stack:not(.card):not(:has(>.subj)){grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+/* nothing on a page may push it wider than the screen (keeps phones from zooming out) */
+#main,.top{contain:inline-size}
+.pill{max-width:100%}
+.ready .pill,.pills .pill{white-space:normal}
 /* the suggestion glow fades a ring in and out (cheap for phones) instead of redrawing the button shadow */
 .pbtn.hint{animation:none;position:relative}
 .pbtn.hint::after{content:"";position:absolute;inset:-5px;border-radius:inherit;box-shadow:0 0 0 4px color-mix(in srgb,var(--g1) 30%,transparent);opacity:0;animation:glowo 2.2s ease-in-out infinite;pointer-events:none;will-change:opacity}

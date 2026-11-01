@@ -716,6 +716,7 @@ const MORE={q:[],n:0,tok:0,
   fill(y){const tok=++this.tok;while(this.q.length&&document.documentElement.scrollHeight<y+innerHeight*1.3)this.step();
     const go=()=>{if(tok!==this.tok)return;if(this.step())setTimeout(go,0)};if(this.q.length)requestAnimationFrame(()=>setTimeout(go,0))}};
 function render(){TIP.hide();const y=window.scrollY;const m=$('main');FX.ctx='r';FX.i=0;MORE.q=[];m.innerHTML=VIEWS[V.tab]();MORE.fill(y);
+  {const wc=m.querySelector('.wkchips'),b=wc&&wc.querySelector('[aria-pressed="true"]');if(b&&wc.scrollWidth>wc.clientWidth)wc.scrollLeft=b.offsetLeft-wc.offsetLeft-(wc.clientWidth-b.offsetWidth)/2} /* phones: keep the chosen week in view */
   if(ENTER){m.className='wrap';void m.offsetWidth;m.classList.add('enter');if(ENTER!=='up')m.classList.add(ENTER);[...m.children].forEach((c,i)=>c.style.animationDelay=Math.min(i,10)*40+'ms');clearTimeout(render.t);render.t=setTimeout(()=>{m.className='wrap'},900);ENTER=null}
   document.querySelectorAll('[data-act="go"]').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===V.tab?'page':'false'));saveUi(store.dirty.size?'saving':'saved');window.scrollTo(0,y)}
 let pendingRender=false;
@@ -1011,7 +1012,7 @@ async function boot(){let docs=null,meta={};
   if(CLOUD.on&&meta.session){CLOUD.sess=meta.session;store.mode='cloud'}else store.mode='local';
   if(migrateWeeks(S))store.mark('plans','settings');
   {const h=location.hash.slice(1);if(VIEWS[h])V.tab=h}
-  applyTheme();render();document.documentElement.classList.add('ready');
+  applyTheme();render();document.documentElement.classList.add('app-ready');
   await syncShared(false);
   if(store.mode==='cloud'){if(store.dirty.size)store.flush();store.pull()}
   render();warmUp()}
