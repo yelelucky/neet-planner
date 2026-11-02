@@ -226,7 +226,7 @@ function prevLeft(ym,id){const pym=shiftYm(ym,-1),pp=S.plans[pym];if(!pp)return 
   const f=findCh(id);if(!f)return 0;let t=0;weeksOf(pym).forEach(w=>t+=+(pp.weeks?.[w.i]?.t?.[id]||0));if(!t)t=+it.target||0;
   const r=monthRange(pym);return Math.max(0,t-doneInRange(f.c,f.s,r.a,r.b))}
 function prevLeftovers(ym){const pp=S.plans[shiftYm(ym,-1)];if(!pp)return[];const cur=plan(ym);
-  return(pp.newCh||[]).filter(x=>!cur.newCh.some(y=>y.id===x.id)).map(x=>({id:x.id,left:prevLeft(ym,x.id)})).filter(x=>x.left>0&&findCh(x.id)&&!findCh(x.id).c.done)}
+  return(pp.newCh||[]).filter(x=>!cur.newCh.some(y=>y.id===x.id)).map(x=>({id:x.id,left:prevLeft(ym,x.id),kind:x.kind})).filter(x=>x.left>0&&findCh(x.id)&&!findCh(x.id).c.done)}
 function lecWeek(ym,i,id){const f=findCh(id);if(!f)return null;const p=plan(ym),W=weeksOf(ym);let cumT=0,cumD=0;
   for(const w of W){if(w.i>=i)break;cumT+=+(p.weeks[w.i]?.t?.[id]||0);cumD+=doneInRange(f.c,f.s,w.start,w.end)}
   const carry=prevLeft(ym,id);const back=Math.max(0,carry+cumT-cumD);const w=W.find(x=>x.i===i);
@@ -299,17 +299,17 @@ const TIP={el:null,cur:null,
 document.addEventListener('pointerover',e=>{if(e.pointerType==='touch')return;const t=e.target.closest('[data-tip]');if(!t){TIP.hide();return}if(TIP.cur!==t){TIP.cur&&TIP.cur.classList.remove('tipon');TIP.cur=t;t.classList.add('tipon')}const b=t.getBoundingClientRect();TIP.show(t.dataset.tip,b.left+b.width/2,b.top)});
 document.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch')return;const t=e.target.closest('[data-tip]');if(!t){TIP.hide();return}TIP.cur&&TIP.cur.classList.remove('tipon');TIP.cur=t;t.classList.add('tipon');const b=t.getBoundingClientRect();TIP.show(t.dataset.tip,b.left+b.width/2,b.top)},{passive:true});
 addEventListener('scroll',()=>TIP.hide(),{passive:true});
-const DEFSND={go:'nav',day:'nav',ym:'nav',wk:'nav',tt:'nav',misf:'tap',syl:'tap',gosyl:'nav',addtask:'open',addrev:'open',marks:'open',edittest:'open',addmis:'open',opench:'open',pickold:'open',addnew:'open',addrevm:'open',
+const DEFSND={go:'nav',day:'nav',ym:'nav',wk:'nav',tt:'nav',misf:'tap',syl:'tap',gosyl:'nav',addtask:'open',addrev:'open',marks:'open',edittest:'open',addmis:'open',opench:'open',pickold:'open',addnew:'open',addrevm:'open',mtab:'nav',wkadd:'add',wkrm:'remove',mplanas:'add',mkind:'tap',glass:'tap',
   closem:'close',rmitem:'remove',rmold:'remove',rmnew:'remove',rmrevm:'remove',rmmis:'remove',unrevwk:'remove',msavetask:'add',mrevpick:'add',mrevadd:'add',addch:'add',addleft:'add',addrevid:'add',revwk:'add',mnewsave:'add',mrmsave:'add',carry:'add',
   moldsave:'save',msavetest:'save',msavemis:'save',gsavech:'save',split:'save',export:'save',mdoimport:'save',theme:'tap',movech:'tap',mset:'tap',mstep:'tap',copybk:'tap',mungiven:'off',sndtest:'lecture',snd:'tap'};
 
 /* ---------- view state ---------- */
-const V={tab:'today',day:today(),ym:planYmOf(today()),wk:weekOfDn(today()).i,tt:'up',syl:'phy',misF:'all',dv:'ov',rg:8,rvF:'all'};
+const V={tab:'today',day:today(),ym:planYmOf(today()),wk:weekOfDn(today()).i,tt:'up',syl:'phy',misF:'all',dv:'ov',rg:8,rvF:'all',mt:'tests'};
 let M=null; // open modal
 let hostTheme=null;
 
 /* ---------- small renderers ---------- */
-const bar=(p,c)=>{const v=clamp(p||0,0,100),f=FX.from(v);return`<div class="bar" ${c?`style="--c:${c}"`:''}><i style="--w0:${f}%;width:${v}%"></i></div>`};
+const bar=(p,c)=>{const v=clamp(p||0,0,100),f=FX.from(v);return`<div class="bar" ${c?`style="--c:${c}"`:''}><i style="--w0:${f}%;--s0:${v?(f/v).toFixed(3):0};width:${v}%"></i></div>`};
 const RC=2*Math.PI*28;
 const ring=(p,c,cls)=>{const v=clamp(p||0,0,100),f=FX.from(v);return`<div class="ring ${cls||''}" style="${c?'--c:'+c:''}"><svg viewBox="0 0 68 68" aria-hidden="true"><circle class="tr" cx="34" cy="34" r="28"/><circle class="vl" cx="34" cy="34" r="28" stroke-dasharray="${RC.toFixed(2)}" style="--o0:${(RC*(1-f/100)).toFixed(2)};--o1:${(RC*(1-v/100)).toFixed(2)}"/></svg><span>${p==null?'–':p+'%'}</span></div>`};
 const sc=s=>'c-'+s;
@@ -370,7 +370,8 @@ function vToday(){const dn=V.day,td=today(),r=dayRec(dn),items=r?.items||[];cons
   const revs=items.map((it,i)=>({it,i})).filter(x=>x.it.k==='rev');
   h+=`<section class="sec"><div class="sec-h"><h2>🌙 R-Q Session · Revision</h2><span class="sub">8:30–10:30 PM</span></div><div class="card stack">`;
   if(!revs.length)h+=`<div class="muted small">No revision chapter added for this day.</div>`;
-  revs.forEach(({it,i})=>{const f=findCh(it.ch);if(!f)return;const on=(f.c.revs||[]).includes(dn);
+  let lastS=null;[...revs].sort((a,b)=>SUBJ.findIndex(s=>s.k===findCh(a.it.ch)?.s)-SUBJ.findIndex(s=>s.k===findCh(b.it.ch)?.s)).forEach(({it,i})=>{const f=findCh(it.ch);if(!f)return;const on=(f.c.revs||[]).includes(dn);
+    if(f.s!==lastS){lastS=f.s;h+=`<div class="sgl ${sc(f.s)}">${SBY[f.s].e} ${SBY[f.s].n}</div>`}
     h+=`<div class="row ${sc(f.s)}" style="flex-wrap:nowrap"><button class="tick ${on?'on':''} grow" data-act="tickrev" data-i="${i}" data-dn="${dn}"><span class="box">✓</span><span class="lbl">${SBY[f.s].e} Revise <b>${esc(f.c.name)}</b></span><span class="when">${on?`✅ Revision #${[...(f.c.revs||[])].sort((a,b)=>a-b).indexOf(dn)+1}`:`Revision #${(f.c.revs||[]).filter(x=>x<dn).length+1} · not done yet`}</span></button><button class="x" data-act="rmitem" data-i="${i}" aria-label="Remove">✕</button></div>`});
   h+=`<button class="add" data-act="addrev">＋ Add revision chapter</button></div></section>`;
   h+=`<section class="sec"><label class="f">📝 Note for this day<textarea id="daynote" data-chg="daynote" data-dn="${dn}" placeholder="e.g. Utilize the time as much as possible">${esc(r?.note||'')}</textarea></label><div class="savebar"><button class="btn pri" data-act="savenow">💾 Save the change</button></div></section>`;
@@ -387,6 +388,14 @@ function taskHtml(it,i,dn){const f=findCh(it.ch);if(!f)return'';const c=f.c,s=f.
 
 /* ---------- WEEK ---------- */
 function monthBar(){return`<div class="monthbar"><button class="iconbtn" data-act="ym" data-d="-1" aria-label="Previous month">‹</button><h1>${ymLabel(V.ym)}</h1><button class="iconbtn" data-act="ym" data-d="1" aria-label="Next month">›</button></div>`}
+/* Chapters are always listed under their subject: Physics, Chemistry, Zoology, Botany. */
+function bySubj(list,idOf){const g={};list.forEach(x=>{const f=findCh(idOf?idOf(x):x);if(f)(g[f.s]=g[f.s]||[]).push({x,f})});return g}
+function sgroups(g,row){return`<div class="sgrid">${SUBJ.filter(s=>g[s.k]?.length).map(s=>`<div class="subj ${sc(s.k)}"><div class="subj-h"><span>${s.e}</span><h3>${s.n}</h3><span class="grow"></span><span class="pill">${g[s.k].length} chapter${g[s.k].length===1?'':'s'}</span></div><div class="sublist">${g[s.k].map(row).join('')}</div></div>`).join('')}</div>`}
+const isBk=it=>it&&it.kind==='bk';
+const kindPill=it=>isBk(it)?'<span class="pill bk">🎯 Backlog chapter</span>':'<span class="pill planp">📘 Class schedule</span>';
+/* Lectures of one chapter given to other weeks of the month, and what is still free to plan. */
+function wkPlanInfo(ym,i,id){const p=plan(ym),it=p.newCh.find(x=>x.id===id);const target=+(it?.target)||0;let other=0;
+  Object.keys(p.weeks).forEach(k=>{if(+k!==+i)other+=+(p.weeks[k]?.t?.[id]||0)});return{target,other,left:Math.max(0,target-other)}}
 function vWeek(){const ym=V.ym,W=weeksOf(ym);if(!W.find(w=>w.i===V.wk))V.wk=1;const w=W.find(x=>x.i===V.wk),p=plan(ym),td=today();const now=weekOfDn(td);
   let h=monthBar()+`<div class="wkchips">${W.map(x=>`<button data-act="wk" data-i="${x.i}" aria-pressed="${x.i===V.wk}" class="${now.ym===ym&&now.i===x.i?'now':''}"><b>Week ${x.i}</b><small>${fDM(x.start)} – ${fDM(x.end)}</small></button>`).join('')}</div>`;
   const pr=weekProgress(ym,V.wk);
@@ -395,50 +404,59 @@ function vWeek(){const ym=V.ym,W=weeksOf(ym);if(!W.find(w=>w.i===V.wk))V.wk=1;co
      <div class="small">📘 Lectures <b class="num">${pr.ld}/${pr.ln}</b> · 🔁 Revision <b class="num">${pr.rd}/${pr.rn}</b> · 🎯 Tests <b class="num">${pr.td}/${pr.tn}</b></div></div></div>`;
   // tests
   const ts=testsInRange(w.start,w.end),sat=weekSat(ym,w);
-  h+=`<section class="sec"><div class="sec-h"><h2>🎯 Tests this week</h2></div><div class="stack">`;
+  h+=`<section class="sec"><div class="sec-h"><h2>🎯 Tests this week</h2></div><div class="stack cgrid">`;
   h+=`<div class="card test old ${sat.t&&sat.t.given?'given':''}"><div class="small muted" style="font-weight:700">🟠 Saturday ${fDM(sat.sat)} · Pending old test${sat.proj?' (planned)':''}</div>
     ${sat.t?`<div style="font-weight:700">${esc(sat.t.name)} ${sat.t.given?'<span class="pill ok">✅ Given</span>':sat.sat<td?'<span class="pill red">Not given</span>':''}</div>`:`<div class="muted">No old test planned. Choose old tests in 📆 Month.</div>`}</div>`;
   ts.forEach(t=>{const miss=!t.given&&tDn(t)<td;h+=`<div class="card test ${t.given?'given':miss?'missed':''}"><div class="small muted" style="font-weight:700">🔵 ${fShort(tDn(t))} · Upcoming test (must give)</div><div style="font-weight:700">${esc(t.name)} ${t.given?'<span class="pill ok">✅ Given</span>':miss?'<span class="pill red">Missed → moved to old tests</span>':''}</div></div>`});
   if(!ts.length)h+=`<div class="muted small">No upcoming test dated this week.</div>`;
   h+=`</div></section>`;
-  // lectures
-  h+=`<section class="sec"><div class="sec-h"><h2>📘 Lecture targets</h2>${p.newCh.length?`<button class="btn sm" data-act="split">⚖️ Split month targets evenly</button>`:''}</div><div class="stack">`;
-  if(!p.newCh.length)h+=emptyBox('No new chapters planned for this month yet.',`<button class="btn pri" data-act="go" data-tab="month">📆 Open Month plan</button>`);
-  p.newCh.forEach(it=>{const r=lecWeek(ym,V.wk,it.id);if(!r)return;const c=r.f.c,s=r.f.s;
-    h+=`<div class="card ${r.back&&r.done<r.need?'backlog':''} ${sc(s)}"><div class="row"><span class="dot"></span><div class="grow" style="font-weight:700">${esc(c.name)} <span class="small muted">${SBY[s].n}</span></div>${c.done?'<span class="pill ok">✅ Complete</span>':''}</div>
-      <div class="row" style="margin-top:8px"><span class="small muted">Target this week</span>
-      <span class="stepper"><button data-act="wkt" data-id="${it.id}" data-d="-1" aria-label="Less">−</button><span>${r.tgt}</span><button data-act="wkt" data-id="${it.id}" data-d="1" aria-label="More">＋</button></span>
-      ${r.back?`<span class="pill red">🔴 Backlog +${r.back}</span>`:''}<span class="grow"></span><b class="num">${r.done}/${r.need} done</b></div>
-      <div style="margin-top:8px">${bar(pct(r.done,r.need||1))}</div></div>`});
-  if(V.wk===1)prevLeftovers(ym).forEach(x=>{const f=findCh(x.id);h+=`<div class="card backlog ${sc(f.s)}"><div class="row"><span class="dot"></span><div class="grow"><span class="lab">🔴 Backlog from last month:</span> <b>${esc(f.c.name)}</b> — ${x.left} lecture${x.left>1?'s':''} left</div><button class="btn sm" data-act="addleft" data-id="${x.id}" data-n="${x.left}">Add to this month</button></div></div>`});
-  h+=`</div></section>`;
+  // lectures: only the chapters you picked for this week, plus unfinished lectures from earlier weeks
+  const wt=p.weeks[V.wk]?.t||{};
+  const shown=p.newCh.filter(it=>{if(it.id in wt)return true;const r=lecWeek(ym,V.wk,it.id);return r&&r.back>0&&r.done<r.need&&!r.f.c.done});
+  const canAdd=p.newCh.filter(it=>!(it.id in wt)&&findCh(it.id)&&!findCh(it.id).c.done);
+  h+=`<section class="sec"><div class="sec-h"><h2>📘 Lectures this week</h2><span class="sub">Pick from this month's planned chapters</span></div>`;
+  if(!p.newCh.length)h+=emptyBox('No new chapters planned for this month yet.',`<button class="btn pri" data-act="mtab" data-v="new">📆 Open Month plan</button>`);
+  else{h+=`<div class="addline card">${canAdd.length?`<select id="wkadd" aria-label="Chapter to add to this week"><option value="">Choose a chapter planned for this month…</option>${SUBJ.map(s=>{const its=canAdd.filter(it=>findCh(it.id).s===s.k);if(!its.length)return'';
+        return`<optgroup label="${s.e} ${s.n}">${its.map(it=>{const f=findCh(it.id),k=wkPlanInfo(ym,V.wk,it.id);return`<option value="${it.id}">${esc(f.c.name)}${isBk(it)?' · 🎯 backlog':''} — ${k.left} of ${k.target} lectures left to plan</option>`}).join('')}</optgroup>`}).join('')}</select>
+      <button class="btn pri" data-act="wkadd">＋ Add to week</button>`:`<div class="small muted grow">All of this month's chapters are already in this week.</div>`}</div>`;
+    if(!shown.length)h+=`<div class="muted small" style="margin-top:10px">No chapters picked for Week ${V.wk} yet. Choose one above.</div>`;
+    else h+=sgroups(bySubj(shown,it=>it.id),({x:it,f})=>{const r=lecWeek(ym,V.wk,it.id),k=wkPlanInfo(ym,V.wk,it.id),picked=it.id in wt,c=f.c;
+      return`<div class="lrow ${r.back&&r.done<r.need?'backlog':''}"><div class="lmain"><b>${esc(c.name)}</b><div class="pills">${isBk(it)?kindPill(it):''}${c.done?'<span class="pill ok">✅ Complete</span>':''}${r.back?`<span class="pill red">🔴 Backlog +${r.back}</span>`:''}</div>
+        <div class="small muted">Month target ${k.target} · other weeks ${k.other} · this week ${r.tgt} · left to plan ${Math.max(0,k.left-r.tgt)}</div></div>
+        <div class="lside">${picked?`<button class="x" data-act="wkrm" data-id="${it.id}" aria-label="Remove from this week" title="Remove from this week">✕</button>`:''}</div>
+        <div class="lfoot"><div class="row">${picked?`<span class="small muted">This week</span><span class="stepper"><button data-act="wkt" data-id="${it.id}" data-d="-1" aria-label="Less">−</button><span>${r.tgt}</span><button data-act="wkt" data-id="${it.id}" data-d="1" aria-label="More">＋</button></span>`:`<span class="small lab">Unfinished from earlier weeks</span><button class="btn sm" data-act="wkadd" data-id="${it.id}">Pick for this week</button>`}<span class="grow"></span><b class="num">${r.done}/${r.need} done</b></div>${bar(pct(r.done,r.need||1))}</div></div>`})}
+  if(V.wk===1){const lo=prevLeftovers(ym);if(lo.length)h+=`<div class="stack" style="margin-top:12px">${lo.map(x=>{const f=findCh(x.id);return`<div class="card backlog ${sc(f.s)}"><div class="row"><span class="dot"></span><div class="grow"><span class="lab">🔴 Unfinished from last month:</span> <b>${esc(f.c.name)}</b> — ${x.left} lecture${x.left>1?'s':''} left</div><button class="btn sm" data-act="addleft" data-id="${x.id}" data-n="${x.left}" data-kind="${x.kind||''}">Add to this month</button></div></div>`}).join('')}</div>`}
+  h+=`</section>`;
   // revision
   const rv=revWeek(ym,V.wk);const unassigned=p.rev.filter(id=>!rv.cur.includes(id)&&!rv.back.includes(id));
-  h+=`<section class="sec"><div class="sec-h"><h2>🔁 Revision this week</h2></div><div class="stack">`;
-  rv.back.forEach(id=>{const f=findCh(id);if(!f)return;const d=revIn(f.c,w.start,w.end);h+=`<div class="card ${d?'':'backlog'} row ${sc(f.s)}"><span class="dot"></span><div class="grow">${d?'':'<span class="lab">🔴 Backlog:</span> '}<b>${esc(f.c.name)}</b></div>${d?'<span class="pill ok">✅ Revised</span>':'<span class="pill red">Not revised</span>'}</div>`});
-  rv.cur.forEach(id=>{const f=findCh(id);if(!f)return;const d=revIn(f.c,w.start,w.end);h+=`<div class="card row ${sc(f.s)}"><span class="dot"></span><div class="grow"><b>${esc(f.c.name)}</b></div><span class="pill planp">📌 Planned</span>${d?'<span class="pill ok">✅ Revised</span>':'<span class="pill warnp">⏳ Not revised yet</span>'}<button class="x" data-act="unrevwk" data-id="${id}" aria-label="Remove from week">✕</button></div>`});
-  if(!rv.cur.length&&!rv.back.length)h+=`<div class="muted small">No revision chapters assigned to this week.</div>`;
-  if(unassigned.length)h+=`<div class="small muted">Tap to assign from this month's revision list:</div><div class="chips">${unassigned.map(id=>{const f=findCh(id);return f?`<button class="chip ${sc(f.s)}" data-act="revwk" data-id="${id}">＋ ${esc(f.c.name)}</button>`:''}).join('')}</div>`;
-  else if(!p.rev.length)h+=`<div class="small muted">Add chapters to revise in 📆 Month first.</div>`;
-  h+=`</div></section>`;return h}
+  h+=`<section class="sec"><div class="sec-h"><h2>🔁 Revision this week</h2></div>`;
+  const rows=[...rv.back.map(id=>({id,back:true})),...rv.cur.map(id=>({id,back:false}))];
+  if(rows.length)h+=sgroups(bySubj(rows,x=>x.id),({x,f})=>{const d=revIn(f.c,w.start,w.end);
+    return x.back?`<div class="lrow ${d?'':'backlog'}"><div class="lmain"><b>${esc(f.c.name)}</b><div class="pills">${d?'<span class="pill ok">✅ Revised</span>':'<span class="pill red">🔴 Backlog · not revised</span>'}</div></div><div class="lside"></div></div>`
+      :`<div class="lrow"><div class="lmain"><b>${esc(f.c.name)}</b><div class="pills"><span class="pill planp">📌 Planned</span>${d?'<span class="pill ok">✅ Revised</span>':'<span class="pill warnp">⏳ Not revised yet</span>'}</div></div><div class="lside"><button class="x" data-act="unrevwk" data-id="${x.id}" aria-label="Remove from week">✕</button></div></div>`});
+  else h+=`<div class="muted small">No revision chapters assigned to this week.</div>`;
+  if(unassigned.length){const g=bySubj(unassigned);h+=`<div class="card stack" style="margin-top:12px"><div class="small muted">Tap to assign from this month's revision list:</div>${SUBJ.filter(s=>g[s.k]).map(s=>`<div class="chiprow ${sc(s.k)}"><span class="chiplab">${s.e} ${s.n}</span><div class="chips">${g[s.k].map(({x:id,f})=>`<button class="chip ${sc(s.k)}" data-act="revwk" data-id="${id}">＋ ${esc(f.c.name)}</button>`).join('')}</div></div>`).join('')}</div>`}
+  else if(!p.rev.length)h+=`<div class="small muted" style="margin-top:8px">Add chapters to revise in 📆 Month first.</div>`;
+  h+=`</section>`;return h}
 
 /* ---------- MONTH ---------- */
+/* The next upcoming test whose syllabus has this chapter (shown on backlog chapters). */
+function nextTestFor(id){return upcomingTests().find(t=>testChapters(t).some(x=>x.c.id===id))||null}
 function vMonth(){const ym=V.ym,p=plan(ym),r=monthRange(ym),td=today(),W=weeksOf(ym);const pr=monthProgress(ym);
   let h=monthBar()+`<div class="small muted" style="text-align:center;margin-top:4px">Plan covers ${fDM(r.a)} – ${fDM(r.b)} · ${W.length} weeks (Mon–Sun · a week counts in the month that has 4+ of its days)</div>`;
   h+=`<div class="card row" style="margin-top:12px;gap:14px">${ring(pr.pc)}<div class="grow stack" style="gap:7px"><div style="font-weight:700">Month progress</div>
      <div class="small">📘 Lectures <b class="num">${pr.ld}/${pr.ln}</b></div>${bar(pct(pr.ld,pr.ln))}
      <div class="small">🔁 Revised <b class="num">${pr.rd}/${pr.rn}</b> · 🎯 Tests given <b class="num">${pr.td}/${pr.tn}</b></div></div></div>`;
-  const left=prevLeftovers(ym);
-  if(left.length){h+=`<section class="sec"><div class="sec-h"><h2>🔴 Backlog from last month</h2></div><div class="stack">`;
-    left.forEach(x=>{const f=findCh(x.id);h+=`<div class="card backlog row ${sc(f.s)}"><span class="dot"></span><div class="grow"><b>${esc(f.c.name)}</b> — ${x.left} lecture${x.left>1?'s':''} not done</div><button class="btn sm" data-act="addleft" data-id="${x.id}" data-n="${x.left}">Add</button></div>`});h+=`</div></section>`}
-  // tests
-  const up=testsInRange(r.a,r.b);const sats=W.length;
-  h+=`<section class="sec"><div class="sec-h"><h2>🎯 Tests this month</h2></div><div class="stack">`;
-  {const L=[];up.forEach(t=>L.push(()=>{let h='';const miss=!t.given&&tDn(t)<td;h+=`<div class="card test ${t.given?'given':miss?'missed':''}"><div class="row"><div class="grow"><b>${esc(t.name)}</b><div class="small muted">${testLine(t)}</div></div>${t.given?'<span class="pill ok">✅ Given</span>':miss?'<span class="pill red">Missed</span>':'<span class="pill ink">🔒 Must give</span>'}</div></div>`;return h}));h+=MORE.list(L,3)}
+  const up=testsInRange(r.a,r.b),oldT=p.old.map(testById).filter(Boolean).sort(byDate);
+  const tabs=[['tests',`🎯 Tests`,up.length+oldT.length],['new',`📘 New chapters`,p.newCh.length],['rev',`🔁 Revise`,p.rev.length]];
+  h+=`<div class="seg mtabs" role="tablist" style="margin-top:14px">${tabs.map(([k,n,c])=>`<button role="tab" data-act="mtab" data-v="${k}" aria-pressed="${V.mt===k}">${n} <span class="cnt">${c}</span></button>`).join('')}</div>`;
+  return h+`<div class="mbody">${V.mt==='new'?mNew(ym,p,r):V.mt==='rev'?mRev(ym,p,r):mTests(ym,p,r,up,oldT,W,td)}</div>`}
+function mTests(ym,p,r,up,oldT,W,td){let h='';const sats=W.length;
+  h+=`<section class="sec"><div class="sec-h"><h2>🎯 Tests this month</h2></div><div class="stack cgrid">`;
+  {const L=[];up.forEach(t=>L.push(()=>{const miss=!t.given&&tDn(t)<td;return`<div class="card test ${t.given?'given':miss?'missed':''}"><div class="row"><div class="grow"><b>${esc(t.name)}</b><div class="small muted">${testLine(t)}</div></div>${t.given?'<span class="pill ok">✅ Given</span>':miss?'<span class="pill red">Missed</span>':'<span class="pill ink">🔒 Must give</span>'}</div></div>`}));h+=MORE.list(L,4)}
   if(!up.length)h+=`<div class="muted small">No upcoming tests dated in this month.</div>`;
-  h+=`<div class="sec-h" style="margin-top:8px"><h3 style="font-size:16px">🟠 Old tests (1 per Saturday · ${sats} Saturdays)</h3><button class="btn sm" data-act="pickold">Choose old tests</button></div>`;
+  h+=`</div></section><section class="sec"><div class="sec-h"><h2>🟠 Old tests <span class="sub">1 per Saturday · ${sats} Saturdays</span></h2><button class="btn sm" data-act="pickold">Choose old tests</button></div><div class="stack cgrid">`;
   if(p.old.length>sats)h+=`<div class="err">You picked ${p.old.length} old tests but this month has only ${sats} Saturdays. The extra ones will carry to next month.</div>`;
-  const oldT=p.old.map(testById).filter(Boolean).sort(byDate);
   oldT.forEach(t=>h+=`<div class="card test old ${t.given?'given':''} row"><div class="grow"><b>${esc(t.name)}</b><div class="small muted">${testLine(t)}</div></div>${t.given?'<span class="pill ok">✅ Given</span>':''}<button class="x" data-act="rmold" data-id="${t.id}" aria-label="Remove">✕</button></div>`);
   if(!oldT.length)h+=`<div class="muted small">No old tests chosen. Pending old tests: <b>${pendingOld().length}</b>.</div>`;
   h+=`</div></section>`;
@@ -446,35 +464,46 @@ function vMonth(){const ym=V.ym,p=plan(ym),r=monthRange(ym),td=today(),W=weeksOf
   const mtests=[...up,...oldT];const MS=monthSyllabus(mtests);
   h+=`<section class="sec"><div class="sec-h"><h2>🧾 Syllabus of this month's tests</h2><span class="sub">${mtests.length} test${mtests.length===1?'':'s'} · ${MS.total} chapter${MS.total===1?'':'s'}</span></div>`;
   if(!mtests.length)h+=emptyBox('No tests in this month yet. Choose old tests above to see their chapters here.');
-  else{h+=`<div class="legend"><span><i class="lg plan"></i>📌 Planned = you chose it for this month</span><span><i class="lg done"></i>✅ Done = only after you tick it on Today</span></div><div class="stack">`;
+  else{h+=`<div class="legend"><span><i class="lg plan"></i>📌 Planned = you chose it for this month</span><span><i class="lg done"></i>✅ Done = only after you tick it on Today</span></div><div class="sgrid">`;
     SUBJ.forEach(s=>{const rows=MS[s.k];if(!rows.length&&!MS.full[s.k])return;
       h+=`<div class="subj ${sc(s.k)}"><div class="subj-h"><span>${s.e}</span><h3>${s.n}</h3><span class="grow"></span><span class="pill">${rows.length} chapter${rows.length===1?'':'s'}</span></div><div class="sylist">`;
       if(MS.full[s.k])h+=`<div class="syrow"><div class="grow"><b>Full syllabus</b><div class="small muted">In: ${MS.full[s.k].map(esc).join(', ')}</div></div></div>`;
-      {const L=[];rows.forEach(x=>L.push(()=>{let h='';const c=x.ch;const isRev=!!c&&p.rev.includes(c.id),isNew=!!c&&p.newCh.some(y=>y.id===c.id);
+      {const L=[];rows.forEach(x=>L.push(()=>{const c=x.ch;const isRev=!!c&&p.rev.includes(c.id),nw=c?p.newCh.find(y=>y.id===c.id):null,isNew=!!nw;
         const stt=c?chStatus(c,s.k):'none',fresh=stt==='none';const rv=c?(c.revs||[]):[];
         const prog=stt==='done'?'<span class="pill ok">✅ Studied</span>':stt==='prog'?`<span class="pill warnp">⏳ ${c.lec?chPct(c,s.k)+'% studied':'Started'}</span>`:'<span class="pill">⬜ Never touched</span>';
         const revp=rv.length?`<span class="pill ok">🔁 Revised ${rv.length}× · last ${fDM(Math.max(...rv))}</span>`:'';
         const key=c?c.id:'n:'+normName(x.base);
-        h+=`<div class="syrow"><div class="grow"><b>${esc(c?c.name:x.base)}</b><div class="pills">${prog}${revp}${c?'':'<span class="pill">Not in your chapter list yet</span>'}</div>
+        return`<div class="syrow"><div class="grow"><b>${esc(c?c.name:x.base)}</b><div class="pills">${prog}${revp}${c?'':'<span class="pill">Not in your chapter list yet</span>'}</div>
           ${x.notes.length?`<div class="small muted">Topics: ${x.notes.map(esc).join(' · ')}</div>`:''}<div class="small muted">In: ${x.tests.map(esc).join(', ')}</div></div><div class="sychoice">
-          ${stt==='done'?'':`<button class="pbtn study ${fresh&&!isRev&&!isNew?'hint':''}" data-act="mtoggle" data-k="new" data-id="${esc(key)}" data-s="${s.k}" aria-pressed="${isNew}">${isNew?'📌 Study planned':'📘 Plan study'}</button>`}
-          <button class="pbtn rev ${!fresh&&!isRev&&!isNew?'hint':''}" data-act="mtoggle" data-k="rev" data-id="${esc(key)}" data-s="${s.k}" aria-pressed="${isRev}">${isRev?'📌 Revision planned':'🔁 Plan revision'}</button></div></div>`;return h}));h+=MORE.list(L,3)}
+          ${stt==='done'?'':`<button class="pbtn study ${fresh&&!isRev&&!isNew?'hint':''}" data-act="mtoggle" data-k="new" data-id="${esc(key)}" data-s="${s.k}" data-name="${esc(c?c.name:x.base)}" aria-pressed="${isNew}">${isNew?(isBk(nw)?'📌 Backlog planned':'📌 Study planned'):'📘 Plan study'}</button>`}
+          <button class="pbtn rev ${!fresh&&!isRev&&!isNew?'hint':''}" data-act="mtoggle" data-k="rev" data-id="${esc(key)}" data-s="${s.k}" aria-pressed="${isRev}">${isRev?'📌 Revision planned':'🔁 Plan revision'}</button></div></div>`}));h+=MORE.list(L,3)}
       h+=`</div></div>`});
     h+=`</div><div class="small muted" style="margin-top:8px">The glowing button is the suggestion: study for chapters you never touched, revise for chapters you started or finished.</div>`}
-  h+=`</section>`;
-  // new chapters
-  h+=`<section class="sec"><div class="sec-h"><h2>📘 New chapters to complete</h2><button class="btn sm" data-act="addnew">＋ Add chapter</button></div><div class="stack">`;
-  if(!p.newCh.length)h+=emptyBox('No new chapters planned. Add the chapters you will watch lectures for this month.');
-  {const L=[];p.newCh.forEach(it=>L.push(()=>{let h='';const f=findCh(it.id);if(!f)return;const st=chStats(f.c,f.s);const dm=doneInRange(f.c,f.s,r.a,r.b);
-    h+=`<div class="card ${sc(f.s)}"><div class="row"><span class="dot"></span><div class="grow"><b>${esc(f.c.name)}</b><div class="small muted">${SBY[f.s].n} · ${st.done}/${st.total} lectures done overall</div><div class="pills"><span class="pill planp">📌 Planned to study</span>${f.c.done?'<span class="pill ok">✅ Studied</span>':dm?`<span class="pill warnp">⏳ ${dm} lecture${dm>1?'s':''} done this month</span>`:'<span class="pill">Not started this month</span>'}</div></div><button class="x" data-act="rmnew" data-id="${it.id}" aria-label="Remove">✕</button></div>
-      <div class="row" style="margin-top:8px"><span class="small muted">Lectures this month</span><span class="stepper"><button data-act="mt" data-id="${it.id}" data-d="-1" aria-label="Less">−</button><span>${+it.target||0}</span><button data-act="mt" data-id="${it.id}" data-d="1" aria-label="More">＋</button></span><span class="grow"></span><b class="num">${Math.min(dm,+it.target||0)}/${+it.target||0}</b></div>
-      <div style="margin-top:8px">${bar(pct(Math.min(dm,+it.target||0),+it.target||0))}</div></div>`;return h}));h+=MORE.list(L,4)}
-  h+=`</div></section>`;
-  // revise
-  h+=`<section class="sec"><div class="sec-h"><h2>🔁 Chapters to revise</h2><button class="btn sm" data-act="addrevm">＋ Add chapter</button></div><div class="stack">`;
-  {const L=[];p.rev.forEach(id=>L.push(()=>{let h='';const f=findCh(id);if(!f)return;const d=revIn(f.c,r.a,r.b);h+=`<div class="card row ${sc(f.s)}"><span class="dot"></span><div class="grow"><b>${esc(f.c.name)}</b> <span class="small muted">${SBY[f.s].n}</span></div><span class="pill planp">📌 Planned</span>${d?'<span class="pill ok">✅ Revised</span>':'<span class="pill warnp">⏳ Not revised yet</span>'}<button class="x" data-act="rmrevm" data-id="${id}" aria-label="Remove">✕</button></div>`;return h}));h+=MORE.list(L,6)}
-  if(!p.rev.length)h+=`<div class="muted small">No revision chapters yet.</div>`;
-  h+=`</div></section>`;return h}
+  return h+`</section>`}
+/* New chapters: two lists, class-schedule chapters and backlog chapters (old chapters you study because they come in tests). */
+function mNew(ym,p,r){let h='';const left=prevLeftovers(ym);
+  if(left.length){h+=`<section class="sec"><div class="sec-h"><h2>🔴 Unfinished from last month</h2></div><div class="stack cgrid">`;
+    left.forEach(x=>{const f=findCh(x.id);h+=`<div class="card backlog row ${sc(f.s)}"><span class="dot"></span><div class="grow"><b>${esc(f.c.name)}</b> — ${x.left} lecture${x.left>1?'s':''} not done</div><button class="btn sm" data-act="addleft" data-id="${x.id}" data-n="${x.left}" data-kind="${x.kind||''}">Add</button></div>`});h+=`</div></section>`}
+  const row=({x:it,f})=>{const st=chStats(f.c,f.s);const dm=doneInRange(f.c,f.s,r.a,r.b),t=+it.target||0;const nt=isBk(it)?nextTestFor(it.id):null;
+    return`<div class="lrow"><div class="lmain"><b>${esc(f.c.name)}</b><div class="small muted">${st.done}/${st.total} lectures done overall</div>
+      <div class="pills">${f.c.done?'<span class="pill ok">✅ Studied</span>':dm?`<span class="pill warnp">⏳ ${dm} lecture${dm>1?'s':''} done this month</span>`:'<span class="pill">Not started this month</span>'}${nt?`<span class="pill bk">🎯 In ${esc(nt.name)} · ${fDM(tDn(nt))}</span>`:''}</div></div>
+      <div class="lside"><button class="x" data-act="rmnew" data-id="${it.id}" aria-label="Remove">✕</button></div>
+      <div class="lfoot"><div class="row"><span class="small muted">Lectures this month</span><span class="stepper"><button data-act="mt" data-id="${it.id}" data-d="-1" aria-label="Less">−</button><span>${t}</span><button data-act="mt" data-id="${it.id}" data-d="1" aria-label="More">＋</button></span><span class="grow"></span><b class="num">${Math.min(dm,t)}/${t}</b></div>${bar(pct(Math.min(dm,t),t))}<div class="lmove"><button class="linkbtn" data-act="mkind" data-id="${it.id}">${isBk(it)?'⇄ Move to class schedule':'⇄ Move to backlog chapters'}</button></div></div></div>`};
+  const sch=p.newCh.filter(it=>!isBk(it)),bk=p.newCh.filter(isBk);
+  h+=`<section class="sec"><div class="sec-h"><h2>📘 Class schedule chapters</h2><button class="btn sm" data-act="addnew" data-kind="sch">＋ Add chapter</button></div><div class="small muted" style="margin:-4px 0 10px">Chapters as per your batch's class schedule.</div>`;
+  h+=sch.length?sgroups(bySubj(sch,it=>it.id),row):emptyBox('No class-schedule chapters planned. Add the chapters your batch is teaching this month.');
+  h+=`</section><section class="sec"><div class="sec-h"><h2>🎯 Backlog chapters</h2><button class="btn sm bkbtn" data-act="addnew" data-kind="bk">＋ Add backlog chapter</button></div><div class="small muted" style="margin:-4px 0 10px">Old chapters you study outside the class schedule because they come in your tests.</div>`;
+  h+=bk.length?sgroups(bySubj(bk,it=>it.id),row):emptyBox('No backlog chapters planned. Add old chapters that are coming in your tests.');
+  return h+`</section>`}
+function mRev(ym,p,r){let h=`<section class="sec"><div class="sec-h"><h2>🔁 Chapters to revise</h2><button class="btn sm" data-act="addrevm">＋ Add chapter</button></div>`;
+  h+=p.rev.length?sgroups(bySubj(p.rev),({x:id,f})=>{const d=revIn(f.c,r.a,r.b);const rv=f.c.revs||[];
+    return`<div class="lrow"><div class="lmain"><b>${esc(f.c.name)}</b><div class="pills"><span class="pill planp">📌 Planned</span>${d?'<span class="pill ok">✅ Revised</span>':'<span class="pill warnp">⏳ Not revised yet</span>'}${rv.length?`<span class="pill">🔁 ${rv.length}× in total</span>`:''}</div></div><div class="lside"><button class="x" data-act="rmrevm" data-id="${id}" aria-label="Remove">✕</button></div></div>`}):emptyBox('No revision chapters yet. Add chapters here or plan them from Tests → syllabus.');
+  return h+`</section>`}
+
+/* Plan study from a test syllabus: choose which list the chapter goes to. */
+function mPlanAs(d){d=Object.assign({},d);openM({title:'📘 Plan study',st:{d},body(){return`<div class="stack"><div><b style="font-size:17px">${esc(d.name||'')}</b><div class="small muted">Which list should this chapter go to?</div></div>
+  <button class="btn pri full choice" data-act="mplanas" data-kind="sch"><span>📘 Class schedule</span><small>Your batch is teaching it now</small></button>
+  <button class="btn full choice bkbtn" data-act="mplanas" data-kind="bk"><span>🎯 Backlog chapter</span><small>Old chapter you study because it is coming in a test</small></button></div>`}})}
 
 /* ---------- TESTS ---------- */
 function vTests(){const td=today();const up=upcomingTests(),old=pendingOld(),giv=S.tests.filter(t=>t.given).sort((a,b)=>b.given-a.given);
@@ -483,7 +512,7 @@ function vTests(){const td=today();const up=upcomingTests(),old=pendingOld(),giv
   h+=`<section class="sec"><div class="seg" role="group">
     <button data-act="tt" data-v="up" aria-pressed="${V.tt==='up'}">📅 Upcoming (${up.length})</button>
     <button data-act="tt" data-v="old" aria-pressed="${V.tt==='old'}">🟠 Old (${old.length})</button>
-    <button data-act="tt" data-v="giv" aria-pressed="${V.tt==='giv'}">✅ Given (${giv.length})</button></div><div class="stack" style="margin-top:12px">`;
+    <button data-act="tt" data-v="giv" aria-pressed="${V.tt==='giv'}">✅ Given (${giv.length})</button></div><div class="stack cgrid" style="margin-top:12px">`;
   const list=V.tt==='up'?up:V.tt==='old'?old:giv;
   if(!list.length)h+=emptyBox(V.tt==='giv'?'No test marked as given yet.':V.tt==='old'?'No pending old tests. 🎉':'No upcoming tests.');
   {const L=[];list.forEach(t=>L.push(()=>{let h='';const d=tDn(t),miss=!t.given&&d!=null&&d<td;const m=t.m||{};const sp=scorePct(t);
@@ -637,7 +666,7 @@ function vMistakes(){const f=V.misF;const rank=mistakeRank(f);const all=allMis()
   if(!rank.length)h+=`<div class="muted small">Nothing logged yet. After a test or DPP, log each mistake here.</div>`;
   rank.slice(0,12).forEach(x=>h+=`<div class="${sc(x.s)}"><div class="row"><span class="dot"></span><span class="grow">${esc(x.name)}</span><b class="num">${x.n}</b></div><div class="stack-bar" style="margin-top:5px;width:${Math.max(8,pct(x.n,mx))}%">${MTYPES.map(t=>x.t[t.k]?`<i style="width:${pct(x.t[t.k],x.n)}%;background:${t.c}" title="${t.n}"></i>`:'').join('')}</div></div>`);
   if(rank.length)h+=`<div class="chips small">${MTYPES.map(t=>`<span class="pill"><span class="dot" style="background:${t.c}"></span>${t.n}</span>`).join('')}</div>`;
-  h+=`</div></section><section class="sec"><div class="sec-h"><h2>🗒️ Recent mistakes</h2></div><div class="stack">`;
+  h+=`</div></section><section class="sec"><div class="sec-h"><h2>🗒️ Recent mistakes</h2></div><div class="stack cgrid">`;
   if(!all.length)h+=emptyBox('No mistakes logged.');
   {const L=[];all.slice(0,60).forEach(x=>L.push(()=>{let h='';const t=MTYPES.find(m=>m.k===x.type)||MTYPES[0];h+=`<div class="card ${sc(x.s)}"><div class="row" style="flex-wrap:nowrap"><span class="dot"></span><div class="grow"><b>${esc(x.ch)}</b>${x.topic?` · ${esc(x.topic)}`:''}<div class="small muted">${t.e} ${t.n} · ${esc(x.src||'')} · ${fDM(x.d)}</div></div><button class="x" data-act="rmmis" data-id="${x.id}" data-m="${toIso(x.d).slice(0,7)}" aria-label="Delete">✕</button></div></div>`;return h}));h+=MORE.list(L,8)}
   return h+`</div></section>`}
@@ -649,7 +678,7 @@ function vSyllabus(){const s=V.syl;const cs=S.ch[s];let u=0,d=0;cs.forEach(c=>{u
   <div class="card ${sc(s)}" style="margin-top:12px"><div class="row"><b class="grow" style="color:var(--c)">${SBY[s].e} ${SBY[s].n}</b><span class="small num">${d}/${u} lectures done</span></div><div style="margin-top:6px">${bar(pct(d,u))}</div>
    <div class="small muted" style="margin-top:8px">Per lecture: ${steps(s).map(st=>esc(stepShort(s,st))).join(' → ')} · then Practice Sheet → Complete</div>
    ${noLec?`<div class="small" style="margin-top:6px;color:var(--warn);font-weight:600">⚠️ ${noLec} chapter${noLec>1?'s':''} still need the number of lectures.</div>`:''}</div>`;
-  h+=`<section class="sec"><div class="stack">`;
+  h+=`<section class="sec"><div class="stack cgrid">`;
   if(!cs.length)h+=emptyBox(`No ${SBY[s].n} chapters yet.`,`<button class="btn pri" data-act="loadncert">Load NCERT chapters</button>`);
   let grp=null;
   {const L=[];cs.forEach((c,i)=>L.push(()=>{let h='';const g=c.cls?'c'+c.cls:'own';if(g!==grp){grp=g;const n=cs.filter(x=>(x.cls?'c'+x.cls:'own')===g).length;h+=`<div class="clshead">${g==='c11'?'📗 Class 11':g==='c12'?'📘 Class 12':'➕ Added by you'} <span>${n} chapter${n>1?'s':''}</span></div>`}
@@ -676,6 +705,8 @@ function vSettings(){const st=S.settings;
     <label class="f">Question bank<input type="text" data-chg="src" data-s="${s.k}" data-f="qb" value="${esc(st.src[s.k]?.qb||'')}"></label>
     ${s.bio?`<label class="f">Combo question bank<input type="text" data-chg="src" data-s="${s.k}" data-f="combo" value="${esc(st.src[s.k]?.combo||'')}"></label>`:''}</div></div>`).join('')}<button class="btn pri" data-act="savenow">💾 Save the change</button></div></section>
   <section class="sec"><div class="sec-h"><h2>🌓 Look</h2></div><div class="seg">${['auto','light','dark'].map(t=>`<button data-act="theme" data-v="${t}" aria-pressed="${st.theme===t}">${t==='auto'?'🖥️ Auto':t==='light'?'☀️ Light':'🌙 Dark'}</button>`).join('')}</div></section>
+  <section class="sec"><div class="sec-h"><h2>✨ Glass effect</h2></div><div class="seg">${[['full','💎 Full blur'],['lite','🪶 Light']].map(([v,n])=>`<button data-act="glass" data-v="${v}" aria-pressed="${(st.glass||'full')===v}">${n}</button>`).join('')}</div>
+    <div class="small muted" style="margin-top:6px">Full: every card is frosted glass. Light: same look, but only the bars and pop-ups blur — smoother on older phones.</div></section>
   <section class="sec"><div class="sec-h"><h2>🔊 Sounds</h2><button class="btn sm" data-act="sndtest">▶️ Test</button></div><div class="seg">${[[0,'🔇 Off'],[0.35,'🔉 Soft'],[0.7,'🔊 Normal'],[1,'📢 Loud']].map(([v,n])=>`<button data-act="snd" data-v="${v}" aria-pressed="${(st.sound===false?0:st.vol)===v}">${n}</button>`).join('')}</div>
     <div class="small muted" style="margin-top:6px">Different sounds for ticking ✓, unticking, a finished lecture 🎉, a completed chapter 🏆, a saved test 🎯, adding, deleting, switching screens and mistakes ⚠️.</div></section>
   ${accountHtml()}
@@ -713,7 +744,8 @@ const MORE={q:[],n:0,tok:0,
   list(items,first){if(items.length<=first)return this.html(items);const id='mo'+(++this.n);this.q.push({id,items:items.slice(first)});return this.html(items.slice(0,first))+`<i data-more="${id}" hidden></i>`},
   step(){const j=this.q[0];if(!j)return false;const mk=document.querySelector(`[data-more="${j.id}"]`);if(!mk){this.q.shift();return this.q.length>0}
     mk.insertAdjacentHTML('beforebegin',this.html(j.items.splice(0,8)));if(!j.items.length){mk.remove();this.q.shift()}return this.q.length>0},
-  fill(y){const tok=++this.tok;while(this.q.length&&document.documentElement.scrollHeight<y+innerHeight*1.3)this.step();
+  fill(y){const tok=++this.tok;/* only when returning to a scrolled-down spot must the rest be drawn first, so the page can scroll back there */
+    if(y>0)while(this.q.length&&document.documentElement.scrollHeight<y+innerHeight*1.3)this.step();
     const go=()=>{if(tok!==this.tok)return;if(this.step())setTimeout(go,0)};if(this.q.length)requestAnimationFrame(()=>setTimeout(go,0))}};
 function render(){TIP.hide();const y=window.scrollY;const m=$('main');FX.ctx='r';FX.i=0;MORE.q=[];m.innerHTML=VIEWS[V.tab]();MORE.fill(y);
   {const wc=m.querySelector('.wkchips'),b=wc&&wc.querySelector('[aria-pressed="true"]');if(b&&wc.scrollWidth>wc.clientWidth)wc.scrollLeft=b.offsetLeft-wc.offsetLeft-(wc.clientWidth-b.offsetWidth)/2} /* phones: keep the chosen week in view */
@@ -724,7 +756,7 @@ function softRender(){const a=document.activeElement;if(M||(a&&/INPUT|TEXTAREA|S
 document.addEventListener('focusout',()=>{if(pendingRender&&!M){setTimeout(()=>{const a=document.activeElement;if(!(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))){pendingRender=false;render()}},50)}});
 function go(tab){V.tab=tab;ENTER='up';window.scrollTo(0,0);render()}
 let tTimer;function toast(msg,kind){if(kind)SND.play(kind);const t=$('toast');t.textContent=msg;t.classList.toggle('bad',kind==='err');t.hidden=false;t.classList.remove('show');void t.offsetWidth;t.classList.add('show');clearTimeout(tTimer);tTimer=setTimeout(()=>{t.classList.remove('show');tTimer=setTimeout(()=>t.hidden=true,300)},2600)}
-function applyTheme(){const t=S.settings.theme;const r=document.documentElement;if(t==='light'||t==='dark')r.setAttribute('data-theme',t);else if(hostTheme)r.setAttribute('data-theme',hostTheme);else r.removeAttribute('data-theme');
+function applyTheme(){const t=S.settings.theme;const r=document.documentElement;r.classList.toggle('glass-lite',S.settings.glass==='lite');if(t==='light'||t==='dark')r.setAttribute('data-theme',t);else if(hostTheme)r.setAttribute('data-theme',hostTheme);else r.removeAttribute('data-theme');
   const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=getComputedStyle(r).getPropertyValue('--bar').trim()||m.content}
 
 /* ---------- modal ---------- */
@@ -821,8 +853,8 @@ function mPickOld(){const p=plan(V.ym,true);const list=[...new Set([...p.old.map
     return`<div class="stack"><div class="small muted">${weeksOf(V.ym).length} Saturdays this month · picked ${st.sel.size}</div>
     ${list.length?list.map(t=>`<button class="tick ${st.sel.has(t.id)?'on':''}" data-act="moldtog" data-id="${t.id}"><span class="box">✓</span><span class="lbl"><b>${esc(t.name)}</b> <span class="small muted">${t.date?fDM(tDn(t)):''}${t.given?' · given':''}</span></span></button>`).join(''):emptyBox('No pending old tests.')}
     <button class="btn pri full" data-act="moldsave">Save</button></div>`}})}
-function mAddNew(){const p=plan(V.ym,true);
-  openM({title:'📘 Add new chapter to month',st:{id:'',t:null},body(){const st=this.st;const opts=chOptions((c)=>!c.done&&!p.newCh.some(x=>x.id===c.id),st.id);
+function mAddNew(kind){const p=plan(V.ym,true);
+  openM({title:kind==='bk'?'🎯 Add backlog chapter':'📘 Add class-schedule chapter',st:{id:'',t:null,kind},body(){const st=this.st;const opts=chOptions((c)=>!c.done&&!p.newCh.some(x=>x.id===c.id),st.id);
     if(!opts)return emptyBox('No open chapters left to add. Add chapters in Syllabus.',`<button class="btn pri" data-act="gosyl" data-s="phy">📚 Open Syllabus</button>`);
     if(!st.id){const m=opts.match(/value="([^"]+)"/);st.id=m&&m[1]}
     const f=findCh(st.id);const left=f?f.c.lec-chStats(f.c,f.s).done:0;if(st.t==null)st.t=left;
@@ -912,28 +944,38 @@ const A={
       const base=Math.floor(rem/useW.length),extra=rem%useW.length;useW.forEach((w,k)=>{wkOf(p,w.i).t[it.id]=base+(k<extra?1:0)})});store.mark('plans');render();toast('Targets split across weeks ⚖️')},
   revwk:d=>{const p=plan(V.ym,true),w=wkOf(p,V.wk);if(!w.rev.includes(d.id))w.rev.push(d.id);store.mark('plans');render()},
   unrevwk:d=>{const p=plan(V.ym,true),w=wkOf(p,V.wk);w.rev=w.rev.filter(x=>x!==d.id);store.mark('plans');render()},
-  addleft:d=>{const p=plan(V.ym,true);if(!p.newCh.some(x=>x.id===d.id))p.newCh.push({id:d.id,target:+d.n});store.mark('plans');render();toast('Added to this month')},
+  addleft:d=>{const p=plan(V.ym,true);if(!p.newCh.some(x=>x.id===d.id))p.newCh.push(Object.assign({id:d.id,target:+d.n},d.kind==='bk'?{kind:'bk'}:{}));store.mark('plans');render();toast('Added to this month')},
   pickold:()=>mPickOld(),
   moldtog:d=>{const s=M.st.sel;const h=s.has(d.id);h?s.delete(d.id):s.add(d.id);renderM();SND.play(h?'off':'on')},
   moldsave:()=>{const p=plan(V.ym,true);p.old=[...M.st.sel];store.mark('plans');closeM()},
   rmold:d=>{const p=plan(V.ym,true);p.old=p.old.filter(x=>x!==d.id);store.mark('plans');render()},
-  addnew:()=>mAddNew(),
+  addnew:d=>mAddNew(d.kind),
   mnewt:d=>{M.st.t=Math.max(0,(M.st.t||0)+ +d.d);renderM()},
-  mnewsave:()=>{const p=plan(V.ym,true);if(M.st.id&&!p.newCh.some(x=>x.id===M.st.id))p.newCh.push({id:M.st.id,target:M.st.t||0});store.mark('plans');closeM()},
+  mnewsave:()=>{const p=plan(V.ym,true);if(M.st.id&&!p.newCh.some(x=>x.id===M.st.id))p.newCh.push(Object.assign({id:M.st.id,target:M.st.t||0},M.st.kind==='bk'?{kind:'bk'}:{}));store.mark('plans');closeM()},
   rmnew:d=>{const p=plan(V.ym,true);p.newCh=p.newCh.filter(x=>x.id!==d.id);store.mark('plans');render()},
   mt:d=>{const p=plan(V.ym,true),it=p.newCh.find(x=>x.id===d.id);it.target=Math.max(0,(+it.target||0)+ +d.d);store.mark('plans');render()},
   addrevm:()=>mAddRevM(),
-  mtoggle:d=>{const p=plan(V.ym,true);let id=d.id;
+  mtoggle:d=>{if(d.k==='new'&&!d.kind){const p=plan(V.ym,true);const c=d.id.startsWith('n:')?null:findCh(d.id)?.c;if(!(c&&p.newCh.some(x=>x.id===c.id))){mPlanAs(d);return}}planToggle(d)},
+  mplanas:d=>{const x=Object.assign({},M.st.d,{kind:d.kind});closeM();planToggle(x)},
+  mkind:d=>{const it=plan(V.ym,true).newCh.find(x=>x.id===d.id);if(!it)return;if(isBk(it))delete it.kind;else it.kind='bk';store.mark('plans');render();toast(isBk(it)?'Moved to backlog chapters 🎯':'Moved to class-schedule chapters 📘')},
+  mtab:d=>{V.mt=d.v;ENTER='up';if(V.tab!=='month'){go('month');return}render()},
+  wkadd:d=>{const id=d.id||$('wkadd')?.value;if(!id){toast('Choose a chapter first','err');return}const p=plan(V.ym,true),W=weeksOf(V.ym),k=wkPlanInfo(V.ym,V.wk,id);
+    const wl=Math.max(1,W.filter(x=>x.i>=V.wk).length);wkOf(p,V.wk).t[id]=Math.ceil(k.left/wl);store.mark('plans');render();toast(`Added to Week ${V.wk} · ${Math.ceil(k.left/wl)} lecture${Math.ceil(k.left/wl)===1?'':'s'} suggested`)},
+  wkrm:d=>{const p=plan(V.ym,true),w=wkOf(p,V.wk);delete w.t[d.id];store.mark('plans');render()},
+};
+function planToggle(d){const p=plan(V.ym,true);let id=d.id;
     if(id.startsWith('n:')){const s=d.s;const row=(monthSyllabus([...testsInRange(monthRange(V.ym).a,monthRange(V.ym).b),...p.old.map(testById).filter(Boolean)])[s]||[]).find(x=>!x.ch&&'n:'+normName(x.base)===id);if(!row||!SBY[s])return;
-      let c=S.ch[s].find(y=>normName(y.name)===normName(row.base));if(!c){c={id:'c-'+uid(),name:row.base,lec:0,p:{},sheet:0,done:0,revs:[]};S.ch[s].push(c);store.mark('ch-'+s)}id=c.id;d={k:d.k,id}}
+      let c=S.ch[s].find(y=>normName(y.name)===normName(row.base));if(!c){c={id:'c-'+uid(),name:row.base,lec:0,p:{},sheet:0,done:0,revs:[]};S.ch[s].push(c);store.mark('ch-'+s)}id=c.id;d={k:d.k,id,kind:d.kind}}
     const f=findCh(id);if(!f)return;let on;
     if(d.k==='rev'){on=!p.rev.includes(d.id);p.rev=on?[...p.rev,d.id]:p.rev.filter(x=>x!==d.id)}
-    else{on=!p.newCh.some(x=>x.id===d.id);if(on)p.newCh.push({id:d.id,target:Math.max(0,f.c.lec-chStats(f.c,f.s).done)});else{p.newCh=p.newCh.filter(x=>x.id!==d.id);Object.values(p.weeks||{}).forEach(w=>{if(w.t)delete w.t[d.id]})}}
-    store.mark('plans');render();SND.play(on?'add':'off');toast(on?(d.k==='rev'?'📌 Revision planned. Tick it on Today when done':(f.c.lec?'📌 Study planned. Tick lectures on Today when done':'📌 Study planned. Set its lecture count in 📚 Syllabus')):'Removed from this month\'s plan')},
+    else{on=!p.newCh.some(x=>x.id===d.id);if(on)p.newCh.push(Object.assign({id:d.id,target:Math.max(0,f.c.lec-chStats(f.c,f.s).done)},d.kind==='bk'?{kind:'bk'}:{}));else{p.newCh=p.newCh.filter(x=>x.id!==d.id);Object.values(p.weeks||{}).forEach(w=>{if(w.t)delete w.t[d.id]})}}
+    store.mark('plans');render();SND.play(on?'add':'off');toast(on?(d.k==='rev'?'📌 Revision planned. Tick it on Today when done':(d.kind==='bk'?'🎯 Backlog chapter planned. ':'📌 Study planned. ')+(f.c.lec?'Tick lectures on Today when done':'Set its lecture count in 📚 Syllabus')):'Removed from this month\'s plan')}
+const A2={
   mrmsave:()=>{const id=$('mrmsel')?.value;const p=plan(V.ym,true);if(id&&!p.rev.includes(id))p.rev.push(id);store.mark('plans');closeM()},
   addrevid:d=>{const p=plan(V.ym,true);if(!p.rev.includes(d.id))p.rev.push(d.id);store.mark('plans');render()},
   rmrevm:d=>{const p=plan(V.ym,true);p.rev=p.rev.filter(x=>x!==d.id);store.mark('plans');render()},
   theme:d=>{S.settings.theme=d.v;applyTheme();store.mark('settings');render()},
+  glass:d=>{S.settings.glass=d.v;applyTheme();store.mark('settings');render()},
   export:async()=>{const data=JSON.stringify({app:'neet2027-planner',version:1,exported:new Date().toISOString(),state:S});const fn=`neet2027-backup-${toIso(today())}.json`;
     try{const file=new File([data],fn,{type:'application/json'});
       if(matchMedia('(pointer:coarse)').matches&&navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:fn});toast('Backup saved ⬇️');return}
@@ -958,6 +1000,7 @@ const A={
   reset:async()=>{if($('resetin').value.trim()!=='RESET'){toast('Type RESET first','err');return}const reload=$('resetload').checked;const theme=S.settings.theme;
     S=fresh();S.settings.theme=theme;if(!reload)S.settings.plannerLoaded=true;store.markAll();await syncShared(false);V.day=today();render();toast('Everything was reset')},
 };
+Object.assign(A,A2);
 const C={
   satpick:el=>{const r=dayRec(+el.dataset.dn,true);r.oldTest=el.value;store.mark(dayKey(+el.dataset.dn));render()},
   daynote:el=>{const r=dayRec(+el.dataset.dn,true);r.note=el.value;store.mark(dayKey(+el.dataset.dn))},

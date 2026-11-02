@@ -1,7 +1,7 @@
 /* Run: node tests/profile-screen.js month [cpuSlowdown=4]
    Opens the app in a hidden Chrome with fake data and lists where the time goes when one screen is drawn 10 times. */
 const {spawn}=require('child_process'),fs=require('fs'),os=require('os'),path=require('path');
-const tab=process.argv[2]||'month',rate=+(process.argv[3]||4),PORT=9334;
+const tab=process.argv[2]||'month',rate=+(process.argv[3]||4),PORT=9334,interval=200;
 const CHROME=['C:/Program Files/Google/Chrome/Application/chrome.exe','C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'].find(fs.existsSync);
 const ch=spawn(CHROME,['--headless=new',`--remote-debugging-port=${PORT}`,`--user-data-dir=${fs.mkdtempSync(path.join(os.tmpdir(),'neetprof-'))}`,'--no-first-run','about:blank'],{stdio:'ignore'});
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));

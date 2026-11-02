@@ -1,0 +1,26 @@
+CPU slowdown 4x (phone-like) · viewport 375x812
+records                          {"chapters":240,"lectureTicks":11683,"revisions":1444,"tests":320,"dayTasks":2706,"mistakes":4000,"total":20153}
+open today                       {"js":9.9,"toScreen":64.1}
+open week                        {"js":58.6,"toScreen":85.3}
+open month                       {"js":43.1,"toScreen":118}
+open tests                       {"js":43,"toScreen":95.3}
+open dash                        {"js":22.2,"toScreen":52.9}
+open mistakes                    {"js":17.9,"toScreen":54.4}
+open syllabus                    {"js":19.3,"toScreen":82.4}
+open settings                    {"js":7,"toScreen":50.2}
+open stats › progress            {"js":24.8,"toScreen":72.3}
+open stats › revisions           {"js":28.2,"toScreen":63.2}
+tick + untick a box (Today)      {"js":58.1,"toScreen":99.4}
+next day                         {"js":44.6,"toScreen":81.5}
+week target + then −             {"js":56,"toScreen":76.1}
+month: plan revision on/off      {"js":68.5,"toScreen":97}
+tests › given list               {"js":43.6,"toScreen":86.8}
+open a test syllabus             {"toScreen":80.9}
+scroll today                     {"frames":150,"avgMs":17.2,"fps":58,"p95Ms":17.3,"slowFrames":1}
+scroll tests                     {"frames":150,"avgMs":18.9,"fps":53,"p95Ms":45,"slowFrames":11}
+scroll syllabus                  {"frames":150,"avgMs":17.7,"fps":57,"p95Ms":28.5,"slowFrames":2}
+scroll mistakes                  {"frames":150,"avgMs":16.7,"fps":60,"p95Ms":17.4,"slowFrames":0}
+save to device (2 big parts)     {"ms":20}
+read all data from device        {"ms":66.6,"kb":1156}
+app opens (to first screen)      {"ms":375}
+background prep finished         {"atMs":540}

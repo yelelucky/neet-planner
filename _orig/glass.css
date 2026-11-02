@@ -1,0 +1,114 @@
+
+/* ===================== Subject-wise lists (Week, Month) ===================== */
+.sublist{display:flex;flex-direction:column}
+.lrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:start;padding:12px 14px;border-top:1px solid var(--glass-line,var(--line))}
+.lrow:first-child{border-top:0}
+.lrow.backlog{background:linear-gradient(90deg,color-mix(in srgb,var(--red-bg) 85%,transparent),transparent);border:0;border-top:1px solid var(--glass-line,var(--line))}
+.lrow.backlog:first-child{border-top:0}
+.lmain{min-width:0;display:flex;flex-direction:column;gap:4px}
+.lmain>b{font-weight:700;line-height:1.3;overflow-wrap:anywhere}
+.lside{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.lfoot{grid-column:1/-1;display:flex;flex-direction:column;gap:8px}
+.lfoot>.row{gap:8px 10px}
+.pills{display:flex;flex-wrap:wrap;gap:5px}
+.pill.bk{background:color-mix(in srgb,var(--gold2) 22%,transparent);color:color-mix(in srgb,var(--gold2) 65%,var(--fg))}
+.linkbtn{border:0;background:none;padding:4px 2px;font-weight:700;font-size:12.5px;color:var(--ink);cursor:pointer;white-space:nowrap}
+.linkbtn:hover{text-decoration:underline}
+.btn.bkbtn{background:linear-gradient(120deg,var(--gold1),var(--gold2));color:#3b2500;border-color:transparent}
+.addline{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.addline select{flex:1 1 260px;min-width:0}
+.chiprow{display:flex;flex-direction:column;gap:6px}
+.chiplab{font-size:12.5px;font-weight:700;color:color-mix(in srgb,var(--c) 75%,var(--fg))}
+.sgl{margin-top:4px;font-size:12.5px;font-weight:800;letter-spacing:.02em;color:color-mix(in srgb,var(--c) 75%,var(--fg))}
+.mtabs .cnt{display:inline-grid;place-items:center;min-width:22px;height:20px;padding:0 6px;border-radius:99px;font-size:11.5px;background:color-mix(in srgb,var(--fg) 10%,transparent)}
+.btn.choice{flex-direction:column;align-items:flex-start;gap:2px;padding:14px 18px;border-radius:20px;text-align:left}
+.btn.choice span{font-size:16px}
+.btn.choice small{font-weight:600;opacity:.8}
+details.ready-d summary{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.sec-h h2 .sub{font-family:var(--f-body);font-weight:600;margin-left:6px}
+@media (max-width:600px){
+  .lrow{padding:11px 12px}
+  .lside .linkbtn{font-size:12px}
+  .mtabs button{font-size:12px;padding:8px 4px}
+  .mtabs .cnt{min-width:18px;height:18px;font-size:10.5px;padding:0 4px}
+}
+
+/* ===================== Liquid glass ===================== */
+/* See-through panels that blur and brighten what is behind them, with a bright top edge, over a soft coloured backdrop. */
+:root{
+  --glass:rgb(255 255 255 / .46);--glass-strong:rgb(255 255 255 / .68);--glass-inner:rgb(255 255 255 / .4);
+  --glass-line:rgb(255 255 255 / .62);--glass-edge:rgb(255 255 255 / .9);--glass-low:rgb(255 255 255 / .28);
+  --glass-shadow:0 6px 14px -8px rgb(18 82 60 / .3);--blur:blur(16px) saturate(170%);
+  --tint:rgb(150 230 197 / .62);--tint2:rgb(82 204 158 / .5);
+  --blob1:#a9f0d1;--blob2:#8fdbe8;--blob3:#ffe6a3;--blob4:#d3c6ff;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --glass:rgb(20 48 40 / .5);--glass-strong:rgb(14 36 30 / .72);--glass-inner:rgb(255 255 255 / .06);
+  --glass-line:rgb(255 255 255 / .11);--glass-edge:rgb(255 255 255 / .22);--glass-low:rgb(255 255 255 / .05);
+  --glass-shadow:0 6px 14px -8px rgb(0 0 0 / .7);--tint:rgb(31 165 122 / .5);--tint2:rgb(14 117 86 / .45);
+  --blob1:#0f6b52;--blob2:#0b4f5c;--blob3:#5c4a14;--blob4:#2a2366}}
+:root[data-theme="dark"]{
+  --glass:rgb(20 48 40 / .5);--glass-strong:rgb(14 36 30 / .72);--glass-inner:rgb(255 255 255 / .06);
+  --glass-line:rgb(255 255 255 / .11);--glass-edge:rgb(255 255 255 / .22);--glass-low:rgb(255 255 255 / .05);
+  --glass-shadow:0 6px 14px -8px rgb(0 0 0 / .7);--tint:rgb(31 165 122 / .5);--tint2:rgb(14 117 86 / .45);
+  --blob1:#0f6b52;--blob2:#0b4f5c;--blob3:#5c4a14;--blob4:#2a2366}
+/* the coloured backdrop the glass sits on (fixed, drawn once) */
+html{background:var(--bg)}
+body{background:transparent}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(42% 36% at 8% 6%,var(--blob1),transparent 70%),radial-gradient(36% 32% at 96% 14%,var(--blob2),transparent 70%),
+    radial-gradient(40% 34% at 82% 92%,var(--blob3),transparent 70%),radial-gradient(38% 30% at 10% 86%,var(--blob4),transparent 72%),var(--bg)}
+/* glass surfaces */
+.card,.subj,.sched div,.wkchips button,.empty,.tbl,.seg{
+  background:linear-gradient(160deg,var(--glass-low),transparent 45%),var(--glass);
+  -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);
+  border:1px solid var(--glass-line);
+  box-shadow:inset 0 1px 0 var(--glass-edge),var(--glass-shadow)}
+.card.backlog{background:linear-gradient(180deg,color-mix(in srgb,var(--red-bg) 80%,transparent),transparent 70%),var(--glass)}
+.card.brandc{background:linear-gradient(140deg,var(--tint),var(--tint2));color:var(--on-brand)}
+.subj-h{background:linear-gradient(90deg,color-mix(in srgb,var(--c) 18%,transparent),transparent);border-bottom:1px solid var(--glass-line)}
+.task,.tick,.sylsub,.mini,.rowbtn,input[type=text],input[type=number],input[type=date],input[type=email],input[type=password],select,textarea{background:var(--glass-inner);border-color:var(--glass-line)}
+.tick.on{background:color-mix(in srgb,var(--c,var(--ink)) 14%,var(--glass-inner))}
+.mini.on{background:var(--c);border-color:var(--c)}
+.stepper button{background:transparent}
+/* small controls inside a glass card: see-through, no second blur (it would not show and costs drawing time) */
+.add,.stepper,#main .iconbtn{background:var(--glass-inner);border:1px solid var(--glass-line);box-shadow:inset 0 1px 0 var(--glass-edge)}
+.stepper{box-shadow:inset 0 1px 0 var(--glass-edge)}
+/* bars: stronger glass with a mint tint */
+.top{background:linear-gradient(120deg,var(--tint),var(--tint2));-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border-bottom:1px solid var(--glass-line);box-shadow:inset 0 -1px 0 var(--glass-low),0 10px 30px -18px rgb(10 58 43 / .55)}
+.top .iconbtn,.savebtn.done{background:var(--glass-inner);border-color:var(--glass-line);box-shadow:inset 0 1px 0 var(--glass-edge)}
+.nav-in{background:linear-gradient(160deg,var(--glass-low),transparent 50%),var(--glass-strong);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--glass-line);box-shadow:inset 0 1px 0 var(--glass-edge),0 18px 40px -16px rgb(10 50 38 / .45)}
+.nav button[aria-current="page"] .e{background:var(--glass-strong);box-shadow:inset 0 1px 0 var(--glass-edge),0 4px 12px -4px rgb(10 60 44 / .35)}
+.hero{background:linear-gradient(135deg,var(--tint),var(--tint2));-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--glass-line);box-shadow:inset 0 1px 0 var(--glass-edge),var(--glass-shadow)}
+.hero::after{border-color:rgb(255 255 255 / .12)}
+.hchip,.hbtn{background:var(--glass-inner);border-color:var(--glass-line);box-shadow:inset 0 1px 0 var(--glass-edge)}
+.hbtn.solid{background:var(--glass-strong);color:var(--fg)}
+/* buttons: clear glass pills; the main action is tinted mint glass */
+.btn{background:var(--glass-inner);border-color:var(--glass-line);box-shadow:inset 0 1px 0 var(--glass-edge)}
+.btn.pri{background:linear-gradient(135deg,var(--tint),var(--tint2));border-color:var(--glass-line);color:var(--on-brand);box-shadow:inset 0 1px 0 var(--glass-edge),0 8px 18px -10px var(--brand3)}
+.btn.bkbtn{background:linear-gradient(120deg,var(--gold1),var(--gold2));color:#3b2500}
+.seg button[aria-pressed="true"]{background:var(--glass-strong);color:var(--fg);box-shadow:inset 0 1px 0 var(--glass-edge),0 4px 14px -6px rgb(10 60 44 / .35)}
+.wkchips button[aria-pressed="true"]{background:linear-gradient(135deg,var(--tint),var(--tint2));color:var(--on-brand);border-color:var(--glass-line)}
+.chip:not([aria-pressed="true"]):not(.red){background:var(--glass-inner);border-color:var(--glass-line)}
+/* pop-ups */
+.scrim{background:rgb(4 22 16 / .28);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.sheet{background:linear-gradient(160deg,var(--glass-low),transparent 40%),var(--glass-strong);-webkit-backdrop-filter:blur(28px) saturate(180%);backdrop-filter:blur(28px) saturate(180%);border:1px solid var(--glass-line);box-shadow:inset 0 1px 0 var(--glass-edge),0 -10px 40px -10px rgb(0 0 0 / .35)}
+.toast{-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);background:color-mix(in srgb,var(--fg) 84%,transparent)}
+@media (min-width:1100px){
+  .nav{background:linear-gradient(180deg,var(--glass-low),transparent 40%),var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border-right:1px solid var(--glass-line)}
+  .nav-in{background:none;-webkit-backdrop-filter:none;backdrop-filter:none;border:0;box-shadow:none}
+  .nav button[aria-current="page"]{background:var(--glass-strong);box-shadow:inset 0 1px 0 var(--glass-edge),0 6px 16px -10px rgb(10 60 44 / .4)}
+  .nav button[aria-current="page"] .e{background:none;box-shadow:none}
+}
+.lmove{display:flex;justify-content:flex-end;margin-top:-4px}
+
+/* a glass panel inside another glass panel (e.g. a test card inside a list card) does not blur twice */
+:is(.card,.subj,.sheet) :is(.card,.subj,.sylsub,.tbl,.seg,.empty){-webkit-backdrop-filter:none;backdrop-filter:none}
+/* Light glass (Settings → Glass effect): cards keep the glass colours and edges but do not blur; bars and pop-ups still do */
+html.glass-lite :is(.card,.subj,.sched div,.wkchips button,.empty,.tbl,.seg){-webkit-backdrop-filter:none;backdrop-filter:none}
+html.glass-lite{--glass:rgb(255 255 255 / .62)}
+@media (prefers-color-scheme: dark){html.glass-lite:not([data-theme="light"]){--glass:rgb(20 48 40 / .72)}}
+html.glass-lite[data-theme="dark"]{--glass:rgb(20 48 40 / .72)}
+/* progress bars grow by stretching (handled by the graphics chip) instead of changing width, so the page is not re-laid out on every frame */
+.bar>i,.ht i,.rvb i{transform-origin:left center;animation-name:barS}
+@keyframes barS{from{transform:scaleX(var(--s0,0))}}

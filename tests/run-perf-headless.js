@@ -3,7 +3,7 @@
    loads 20,000+ fake records and prints how fast each screen opens, taps respond, saves finish and pages scroll.
    cpuSlowdown 4 ≈ a mid-range Android phone; 1 = this PC. Uses its own empty browser profile, never your data. */
 const {spawn}=require('child_process'),fs=require('fs'),os=require('os'),path=require('path');
-const rate=+(process.argv[2]||4),URL_='http://localhost:5173/',PORT=9333;
+const rate=+(process.argv[2]||4),glass=process.argv[3]||'full',URL_='http://localhost:5173/',PORT=9333;
 const CHROME=['C:/Program Files/Google/Chrome/Application/chrome.exe','C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'].find(fs.existsSync);
 const prof=fs.mkdtempSync(path.join(os.tmpdir(),'neetperf-'));
 const ch=spawn(CHROME,['--headless=new',`--remote-debugging-port=${PORT}`,`--user-data-dir=${prof}`,'--no-first-run','--disable-gpu-vsync=false','about:blank'],{stdio:'ignore'});
@@ -22,6 +22,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   const t0=Date.now();await send('Page.reload');await sleep(300);
   const boot=await ev(`new Promise(r=>{const c=()=>document.documentElement.classList.contains('app-ready')?r(performance.now()):setTimeout(c,10);c()})`);
   const warm=await ev(`new Promise(r=>{const c=()=>warmUp.done?r(warmUp.done):setTimeout(c,50);c()})`); /* background prep, while Today is on screen */
+  await ev(`S.settings.glass='${glass}';applyTheme();true`);
   const res=await ev(`import('/tests/perf.js').then(async()=>{return PERF.run()})`);
   res['app opens (to first screen)']={ms:Math.round(boot)};res['background prep finished']={atMs:Math.round(warm)};
   console.log(`\nCPU slowdown ${rate}x (${rate>1?'phone-like':'this PC'}) · viewport 375x812\n`);

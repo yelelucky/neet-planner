@@ -69,7 +69,11 @@ html.app-ready #splash{opacity:0;visibility:hidden;pointer-events:none}
 /* tablet: a little wider, subjects side by side */
 @media (min-width:900px) and (max-width:1099.98px){
   .wrap,.top-in{max-width:960px}
-  main .stack:has(>.subj){display:grid;grid-template-columns:1fr 1fr;align-items:start}
+}
+/* subject groups (Physics, Chemistry, Zoology, Botany): stacked on phones, two per row on tablets and desktops */
+.sgrid{display:flex;flex-direction:column;gap:12px}
+@media (min-width:900px){
+  .sgrid,main .stack:has(>.subj){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:14px}
 }
 /* ===== Desktop (1100px and wider): side menu, full-width content, cards in columns ===== */
 @media (min-width:1100px){
@@ -95,10 +99,10 @@ html.app-ready #splash{opacity:0;visibility:hidden;pointer-events:none}
   .wrap,.top-in{max-width:1240px;padding-left:32px;padding-right:32px}
   .wrap{padding-block:26px 56px}
   .toast{bottom:28px;left:calc(50% + var(--rail) / 2)}
-  /* lists of cards flow into two columns; headings, notes and buttons in a list still take the full width */
-  #main .sec>.stack:not(.card){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:14px}
-  #main .sec>.stack:not(.card)>:not(.card):not(.subj){grid-column:1/-1}
-  #main .sec>.stack:not(.card)>.card.backlog,#main .sec>.stack:not(.card)>.card:only-child{grid-column:1/-1}
+  /* same-size cards (tests, chapters, mistakes) sit two per row; notes and headings in between take the full width */
+  #main .cgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:14px}
+  #main .cgrid>:not(.card){grid-column:1/-1}
+  #main .cgrid>.card:only-of-type,#main .cgrid>.card.backlog{grid-column:1/-1}
   /* Today: date card and day plan side by side, schedule under them */
   #main .hero{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px 24px;padding:24px 28px}
   #main .hero .hero-top{grid-column:1}
@@ -118,13 +122,10 @@ html.app-ready #splash{opacity:0;visibility:hidden;pointer-events:none}
   .syl{grid-template-columns:repeat(2,minmax(0,1fr))}
   /* cards react to the mouse */
   .card,.subj{transition:box-shadow .2s,transform .2s}
-  #main .sec>.stack:not(.card)>.card:hover{box-shadow:var(--shadow),0 14px 28px -18px rgb(16 72 50 / .45)}
+  #main .cgrid>.card:hover,#main .sgrid>.subj:hover{transform:translateY(-1px)}
   .btn,.chip,.pbtn,.tick,.add,.x,.mini{cursor:pointer}
   .tick:hover{border-color:color-mix(in srgb,var(--c,var(--brand3)) 55%,var(--line))}
   .sheet{max-width:720px}
-}
-@media (min-width:1500px){
-  #main .sec>.stack:not(.card):not(:has(>.subj)){grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 /* nothing on a page may push it wider than the screen (keeps phones from zooming out) */
 #main,.top{contain:inline-size}
@@ -132,5 +133,5 @@ html.app-ready #splash{opacity:0;visibility:hidden;pointer-events:none}
 .ready .pill,.pills .pill{white-space:normal}
 /* the suggestion glow fades a ring in and out (cheap for phones) instead of redrawing the button shadow */
 .pbtn.hint{animation:none;position:relative}
-.pbtn.hint::after{content:"";position:absolute;inset:-5px;border-radius:inherit;box-shadow:0 0 0 4px color-mix(in srgb,var(--g1) 30%,transparent);opacity:0;animation:glowo 2.2s ease-in-out infinite;pointer-events:none;will-change:opacity}
+.pbtn.hint::after{content:"";position:absolute;inset:-5px;border-radius:inherit;box-shadow:0 0 0 4px color-mix(in srgb,var(--g1) 30%,transparent);opacity:0;animation:glowo 2.2s ease-in-out infinite;pointer-events:none}
 @keyframes glowo{50%{opacity:1}}
