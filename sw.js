@@ -1,6 +1,6 @@
 /* Offline support. The app files are kept on the device, so the planner opens without internet.
    Bump VERSION on every release so devices pick up the new files. */
-const VERSION='neet27-v1.1.0';
+const VERSION='neet27-v1.2.0';
 const APP=['./','index.html','app.css','app.js','storage.js','shared-data.js','config.js','manifest.webmanifest',
   'icons/icon.svg','icons/icon-192.png','icons/icon-512.png','icons/maskable-192.png','icons/maskable-512.png','icons/apple-touch-icon.png','icons/favicon-32.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(VERSION).then(c=>c.addAll(APP)))});

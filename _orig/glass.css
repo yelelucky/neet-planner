@@ -112,3 +112,33 @@ html.glass-lite[data-theme="dark"]{--glass:rgb(20 48 40 / .72)}
 /* progress bars grow by stretching (handled by the graphics chip) instead of changing width, so the page is not re-laid out on every frame */
 .bar>i,.ht i,.rvb i{transform-origin:left center;animation-name:barS}
 @keyframes barS{from{transform:scaleX(var(--s0,0))}}
+
+/* ===== Phones and tablets: no lag =====
+   The backdrop is a soft gradient that stays still while the page scrolls, so blurring each card over it looks the same
+   but makes the phone redo every card's blur on every scroll frame. Cards skip the blur here; only the top bar, tab bar
+   and pop-ups (which float over moving content) keep real frosted glass, with a lighter blur. */
+@media (max-width:1099.98px),(pointer:coarse){
+  :root{--blur:blur(12px) saturate(160%)}
+  .card,.subj,.sched div,.wkchips button,.empty,.tbl,.seg,.btn.pri,.chip,.pbtn,.hero{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+  .card,.subj,.sched div,.wkchips button,.empty,.tbl,.seg{background:linear-gradient(160deg,var(--glass-low),transparent 45%),var(--glass-solid,var(--glass))}
+  .scrim{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgb(4 22 16 / .42)}
+  .toast{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--fg)}
+}
+:root{--glass-solid:rgb(255 255 255 / .58)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--glass-solid:rgb(20 48 40 / .66)}}
+:root[data-theme="dark"]{--glass-solid:rgb(20 48 40 / .66)}
+
+/* tick-box chapter pickers */
+.pickf{position:sticky;top:-10px;z-index:2;padding:6px 0;background:linear-gradient(var(--glass-strong) 70%,transparent)}
+.picklist{display:flex;flex-direction:column;gap:6px}
+.pickrow{display:flex;flex-direction:column;gap:8px;border-radius:16px}
+.pickrow.on{background:color-mix(in srgb,var(--c) 8%,transparent);padding-bottom:10px}
+.pickx{padding:0 10px;display:flex;flex-direction:column;gap:8px}
+.pnote{display:block;font-weight:500;color:var(--muted);font-size:12px}
+.pickbar{position:sticky;bottom:calc(-22px - env(safe-area-inset-bottom,0px));display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0 calc(4px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,var(--glass-strong) 30%)}
+.stepper button:disabled{opacity:.35;cursor:not-allowed}
+.warnt{color:var(--warn);font-weight:600}
+@media (max-width:1099.98px),(pointer:coarse){.sheet{-webkit-backdrop-filter:blur(16px) saturate(160%);backdrop-filter:blur(16px) saturate(160%)}}
+.pickrow .tick.on .lbl{text-decoration:none;color:var(--fg)}
+.pickbar .small{white-space:nowrap}
+.pickbar .btn{flex:1;max-width:340px}

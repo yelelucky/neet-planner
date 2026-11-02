@@ -40,7 +40,7 @@ window.PERF={
     out['tick + untick a box (Today)']=await this.tap('.tick[data-act="tick"]');
     out['next day']=await this.tap('[data-act="day"][data-d="1"]','[data-act="day"][data-d="-1"]');
     V.tab='week';render();await this.frame();out['week target + then −']=await this.tap('[data-act="wkt"][data-d="1"]','[data-act="wkt"][data-d="-1"]');
-    V.tab='month';render();await this.frame();out['month: plan revision on/off']=await this.tap('[data-act="mtoggle"][data-k="rev"]');
+    V.tab='month';V.mt='tests';render();await this.frame();await this.settle();out['month: plan revision on/off']=await this.tap('[data-act="mtoggle"][data-k="rev"]');
     V.tt='giv';out['tests › given list']=await this.timeRender('tests');out['open a test syllabus']=await (async()=>{const ds=[...document.querySelectorAll('details[data-lazy]')].slice(0,5);const ts=[];for(const d of ds){const t0=performance.now();d.open=true;await new Promise(r=>d.addEventListener('toggle',r,{once:true}));await this.frame();ts.push(performance.now()-t0);await this.settle()}return{toScreen:this.med(ts)}})();
     for(const tab of ['today','tests','syllabus','mistakes']){V.tab=tab;if(tab==='tests')V.tt='giv';render();await this.frame();out['scroll '+tab]=await this.scroll()}
     {const t0=performance.now();store.mark('ch-phy','tests');await store.writeLocal();out['save to device (2 big parts)']={ms:+(performance.now()-t0).toFixed(1)}}
